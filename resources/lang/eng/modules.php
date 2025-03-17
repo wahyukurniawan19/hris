@@ -353,7 +353,13 @@ return array(
             'followUp-created' => 'Deal Follow Up is created',
             'followUp-updated' => 'Deal Follow Up is updated',
             'followUp-deleted' => 'Deal Follow Up is deleted',
-        ]
+        ],
+        'employeeNpwp' => 'NPWP',
+        'employeeNik' => 'NIK',
+        'employeeAgama' => 'Religion',
+        'employeeTempatLahir' => 'Place of Birth',
+        'employeeBpjsKs' => 'BPJS Kesehatan',
+        'employeeBpjsKt' => 'BPJS Ketenagakerjaan'
 
     ),
     'projects' => array(

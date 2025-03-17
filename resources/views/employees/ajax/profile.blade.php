@@ -165,25 +165,34 @@ $viewAppreciationPermission = user()->permission('view_appreciation');
                                 $currentDay = \Carbon\Carbon::parse(now(company()->timezone)->toDateTimeString())->startOfDay()->setTimezone('UTC');
                                 $joiningDay = $employee->employeeDetail->joining_date;
 
-                                $totalWorkYears = $joiningDay->copy()->diffInYears($currentDay);
-                                $totalWorkMonths = $joiningDay->copy()->diffInMonths($currentDay);
+                                $diff = $joiningDay->copy()->diff($currentDay);
+                                $totalWorkYears = $diff->y;
+                                $totalWorkMonths = $diff->m;
+                                $totalWorkDays = $diff->d;
                             @endphp
 
-                        <x-cards.data-row
-                            :label="__('modules.employees.workAnniversary')"
-                            :value="!is_null($employee->employeeDetail) && !is_null($employee->employeeDetail->joining_date)
-                                ? (
-                                    ($diffInHoursJoiningDate > -23 && $diffInHoursJoiningDate <= 0 && $totalWorkYears == 0 )
-                                    ? __('modules.dashboard.joinedToday')
-                                    : (
-                                        ($totalWorkYears > 0 && $totalWorkMonths % 12 == 0)
-                                        ? __('app.completed') . ' ' . $totalWorkYears . ' ' . __('app.year')
-                                        : $currentyearJoiningDate->longRelativeToNowDiffForHumans()
+                            <x-cards.data-row
+                                :label="__('modules.employees.workAnniversary')"
+                                :value="!is_null($employee->employeeDetail) && !is_null($employee->employeeDetail->joining_date)
+                                    ? (
+                                        ($diffInHoursJoiningDate > -23 && $diffInHoursJoiningDate <= 0 && $totalWorkYears == 0 )
+                                        ? __('modules.dashboard.joinedToday')
+                                        : (
+                                            ($totalWorkYears > 0 || $totalWorkMonths > 0 || $totalWorkDays > 0)
+                                            ? $totalWorkYears . ' ' . __('app.year') . ' ' . $totalWorkMonths . ' ' . __('app.month') . ' ' . $totalWorkDays . ' ' . __('app.day')
+                                            : $currentyearJoiningDate->longRelativeToNowDiffForHumans()
+                                        )
                                     )
-                                )
-                                : '--'"
-                        />
-
+                                    : '--'"
+                            />
+                            <x-cards.data-row :label="__('modules.employees.employeeNpwp')"
+                                        :value="$employee->employeeDetail->npwp ?? '--'" />
+                            <x-cards.data-row :label="__('modules.employees.employeeNik')"
+                                        :value="$employee->employeeDetail->nik ?? '--'" />
+                            <x-cards.data-row :label="__('modules.employees.employeeAgama')"
+                                        :value="$employee->employeeDetail->religion ?? '--'" />
+                            <x-cards.data-row :label="__('modules.employees.employeeTempatLahir')"
+                                        :value="$employee->employeeDetail->place_birth ?? '--'" />
                             <x-cards.data-row :label="__('modules.employees.dateOfBirth')"
                                               :value="(!is_null($employee->employeeDetail) && !is_null($employee->employeeDetail->date_of_birth)) ? $employee->employeeDetail->date_of_birth->translatedFormat('d F') : '--'" />
 
@@ -195,9 +204,6 @@ $viewAppreciationPermission = user()->permission('view_appreciation');
 
                                 <x-cards.data-row :label="__('modules.employees.slackUsername')"
                                     :value="(isset($employee->employeeDetail) && !is_null($employee->employeeDetail->slack_username)) ? '@'.$employee->employeeDetail->slack_username : '--'" />
-
-                                <x-cards.data-row :label="__('modules.employees.hourlyRate')"
-                                    :value="(!is_null($employee->employeeDetail)) ? company()->currency->currency_symbol.$employee->employeeDetail->hourly_rate : '--'" />
 
                                 <x-cards.data-row :label="__('app.address')"
                                     :value="$employee->employeeDetail->address ?? '--'" />
@@ -235,6 +241,10 @@ $viewAppreciationPermission = user()->permission('view_appreciation');
                                     <x-cards.data-row :label="__('modules.employees.contractEndDate')"
                                     :value="$employee->employeeDetail->contract_end_date ? Carbon\Carbon::parse($employee->employeeDetail->contract_end_date)->translatedFormat(company()->date_format) : '--'" />
                                 @endif
+                                <x-cards.data-row :label="__('modules.employees.employeeBpjsKs')"
+                                    :value="$employee->employeeDetail->bpjs_ks ?? '--'" />
+                                <x-cards.data-row :label="__('modules.employees.employeeBpjsKt')"
+                                    :value="$employee->employeeDetail->bpjs_kt ?? '--'" />
 
                                 <x-cards.data-row :label="__('modules.employees.joiningDate')"
                                 :value="(!is_null($employee->employeeDetail) && !is_null($employee->employeeDetail->joining_date)) ? $employee->employeeDetail->joining_date->translatedFormat(company()->date_format) : '--'" />
