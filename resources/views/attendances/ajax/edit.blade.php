@@ -44,7 +44,9 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
                                 <x-forms.text class="a-timepicker" :fieldLabel="__('modules.attendance.clock_in')"
                                     :fieldPlaceholder="__('placeholders.hours')" fieldName="clock_in_time"
                                     fieldId="clock-in-time" fieldRequired="true"
-                                    :fieldValue="(!is_null($row->clock_in_time)) ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $row->clock_in_time)->timezone(company()->timezone)->translatedFormat(company()->time_format) : ''" />
+                                    :fieldValue="!is_null($row->clock_in_time) ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $row->clock_in_time)->timezone(company()->timezone)->translatedFormat(company()->time_format)
+                                                : (isset($shift->office_start_time) ? \Carbon\Carbon::createFromFormat('H:i:s', $shift->office_start_time)->translatedFormat(company()->time_format) : '')"
+                                />
                             </div>
                         </div>
 
@@ -74,7 +76,9 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
                                 <x-forms.text :fieldLabel="__('modules.attendance.clock_out')"
                                     :fieldPlaceholder="__('placeholders.hours')" fieldName="clock_out_time"
                                     fieldId="clock-out"
-                                    :fieldValue="(!is_null($row->clock_out_time)) ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $row->clock_out_time)->timezone(company()->timezone)->translatedFormat(company()->time_format) : ''" />
+                                    :fieldValue="!is_null($row->clock_out_time) ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $row->clock_out_time)->timezone(company()->timezone)->translatedFormat(company()->time_format)
+                                                : (isset($shift->office_end_time) ? \Carbon\Carbon::createFromFormat('H:i:s', $shift->office_end_time)->translatedFormat(company()->time_format) : '')"
+                                />
                             </div>
                         </div>
 

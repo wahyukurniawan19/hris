@@ -106,10 +106,6 @@ class AttendanceController extends AccountBaseController
                     $endOfMonth = $endOfMonth->subMinutes($officeEndTimeDB->offset / 60);
 
                     $query->whereBetween('attendances.clock_in_time', [$startOfMonth, $endOfMonth]);
-
-                    // $query->orwhereRaw('MONTH(attendances.clock_in_time) = ?', [$request->month])
-                        // ->orwhereRaw('YEAR(attendances.clock_in_time) = ?', [$request->year]);
-
                     if ($this->viewAttendancePermission == 'added') {
                         $query->where('attendances.added_by', user()->id);
 
@@ -562,6 +558,7 @@ class AttendanceController extends AccountBaseController
         $this->attendanceUser = User::withoutGlobalScope(ActiveScope::class)->findOrFail($userid);
         $this->type = 'add';
         $this->maxAttendanceInDay = $this->attendanceSettings->clockin_in_day;
+        $this->shift = isset($attendanceSettings->shift) ? $attendanceSettings->shift : null;
         $this->location = CompanyAddress::all();
 
         return view('attendances.ajax.edit', $this->data);

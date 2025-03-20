@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 <div class="modal-header">
     <h5 class="modal-title" id="modelHeading">@lang('modules.attendance.clock_in')</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -15,14 +16,10 @@
                     </h4>
                     <div class="row">
                         <div class="col-md-6">
-                            <x-forms.select fieldId="location" :fieldLabel="__('app.location')" fieldName="location"
-                                            search="true">
-                                @foreach ($location as $locations)
-                                    <option @if ($locations->id == $user->employeeDetail->company_address_id) selected
-                                            @endif value="{{ $locations->id }}">
-                                        {{ $locations->location }}</option>
-                                @endforeach
-                            </x-forms.select>
+                            <x-forms.text fieldId="location" :fieldLabel="__('Location')"
+                                fieldName="location" :fieldPlaceholder="__('Location')" :fieldValue="$lead->location ?? ''"
+                                :fieldReadOnly="true">
+                            </x-forms.text>
                         </div>
                         <div class="col-md-6">
                             <x-forms.select fieldId="work_from_type" :fieldLabel="__('modules.attendance.working_from')"
@@ -37,6 +34,26 @@
                             <x-forms.text fieldId="working_from" :fieldLabel="__('modules.attendance.otherPlace')"
                                           fieldName="working_from" fieldRequired="true">
                             </x-forms.text>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <x-forms.text fieldId="notes" :fieldLabel="__('Notes')"
+                                fieldName="notes" :fieldPlaceholder="__('Notes')" :fieldValue="$lead->notes ?? ''">
+                            </x-forms.text>
+                        </div>
+                        <div class="col-md-6">
+                        <x-forms.file allowedFileExtensions="png jpg jpeg svg bmp" class="mr-0 mr-lg-2 mr-md-2 cropper"
+                            :fieldLabel="__('Attachments')" fieldName="photo" fieldId="photo"
+                            fieldHeight="119" :popover="__('File')" />
+                            <video id="camera-preview" width="100%" autoplay style="display: none;"></video>
+                            <canvas id="camera-canvas" style="display: none;"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <x-forms.button-primary id="open-camera">@lang('Open Camera')</x-forms.button-primary>
+                            <x-forms.button-primary id="take-photo">@lang('Take Photo')</x-forms.button-primary>
                         </div>
                     </div>
                 </div>
@@ -77,6 +94,7 @@
 
         const currentLatitude = document.getElementById("current-latitude").value;
         const currentLongitude = document.getElementById("current-longitude").value;
+        const notes = $('#notes').val();
 
         const token = "{{ csrf_token() }}";
 
@@ -93,6 +111,7 @@
                 work_from_type: work_from_type,
                 currentLatitude: currentLatitude,
                 currentLongitude: currentLongitude,
+                notes: notes,
                 _token: token
             },
             success: function (response) {
@@ -102,5 +121,64 @@
             }
         })
     })
+    function setCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var lat = document.getElementById("current-latitude").value;
+                var lon = document.getElementById("current-longitude").value;
 
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('location').value = data.display_name;
+                    })
+                    .catch(error => console.log('Error mendapatkan lokasi:', error));
+            }, function (error) {
+                console.log('Gagal mendapatkan lokasi:', error);
+            });
+        }
+    }
+
+    $(document).on('shown.bs.modal', '#clockInModal', function () {
+        setCurrentLocation();
+    });
+    document.getElementById('open-camera').addEventListener('click', function() {
+        let video = document.getElementById('camera-preview');
+        let takePhotoBtn = document.getElementById('take-photo');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.style.display = 'block';
+                takePhotoBtn.style.display = 'block';
+            })
+            .catch(function(error) {
+                alert("Kamera tidak dapat diakses: " + error);
+            });
+    });
+
+    document.getElementById('take-photo').addEventListener('click', function() {
+        let video = document.getElementById('camera-preview');
+        let canvas = document.getElementById('camera-canvas');
+        let context = canvas.getContext('2d');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(function(blob) {
+            let fileInput = document.getElementById('photo');
+            let file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+
+            let dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        });
+
+        let stream = video.srcObject;
+        let tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+
+        video.style.display = 'none';
+    });
 </script>

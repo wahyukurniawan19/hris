@@ -802,8 +802,10 @@ trait EmployeeDashboard
             $attendance->clock_in_ip = request()->ip();
 
             $attendance->working_from = $request->working_from;
-            $attendance->location_id = $request->location;
+            $attendance->location = $request->location;
             $attendance->work_from_type = $request->work_from_type;
+            $attendance->notes = $request->notes;
+            $attendance->image = $request->image;
 
             if ($now->gt($lateTime) && $isLate === 'yes') {
                 $attendance->late = 'yes';
