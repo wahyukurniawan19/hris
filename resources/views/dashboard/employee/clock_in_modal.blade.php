@@ -166,7 +166,6 @@
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Konversi canvas ke file (Blob) dan simpan ke input file
         canvas.toBlob(function(blob) {
             let fileInput = document.getElementById('photo');
             let file = new File([blob], "photo.jpg", { type: "image/jpeg" });
@@ -176,7 +175,6 @@
             fileInput.files = dataTransfer.files;
         });
 
-        // Matikan kamera
         let stream = video.srcObject;
         let tracks = stream.getTracks();
         tracks.forEach(track => track.stop());
