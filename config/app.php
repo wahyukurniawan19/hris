@@ -76,7 +76,7 @@ return [
     |
     */
 
-    'debug' => true,
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
         |--------------------------------------------------------------------------
@@ -88,7 +88,7 @@ return [
         | application. If disabled, a simple generic error page is shown.
         |
         */
-    'api_debug' => true,
+    'api_debug' => env('APP_API_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
