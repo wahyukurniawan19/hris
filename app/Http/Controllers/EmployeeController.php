@@ -104,7 +104,6 @@ class EmployeeController extends AccountBaseController
     public function create()
     {
         $this->pageTitle = __('app.addEmployee');
-        // dump('testing');die;
 
         $addPermission = user()->permission('add_employees');
         abort_403(!in_array($addPermission, ['all', 'added']));
