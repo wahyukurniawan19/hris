@@ -46,10 +46,10 @@
                                 @if ($attendance->work_from_type != '')
                                     @if ($attendance->work_from_type == 'other')
                                         <i class="fa fa-map-marker-alt ml-2"></i>
-                                        {{ $attendance->location }} ({{$attendance->working_from}})
+                                        {{ $attendance->location }}
                                     @else
                                         <i class="fa fa-map-marker-alt ml-2"></i>
-                                        {{ $attendance->location }} ({{$attendance->work_from_type}})
+                                        {{ $attendance->location }}
                                     @endif
                                 @endif
                             </td>
@@ -123,10 +123,10 @@
                                             @if ($attendance->work_from_type != '')
                                                 @if ($attendance->work_from_type == 'other')
                                                     <i class="fa fa-map-marker-alt ml-2"></i>
-                                                    {{ $attendance->location }} ({{$attendance->working_from}})
+                                                    {{ $attendance->location }}
                                                 @else
                                                     <i class="fa fa-map-marker-alt ml-2"></i>
-                                                    {{ $attendance->location }} ({{$attendance->work_from_type}})
+                                                    {{ $attendance->location }}
                                                 @endif
                                             @endif
                                         </td>

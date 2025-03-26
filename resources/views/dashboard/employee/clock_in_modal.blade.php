@@ -45,8 +45,9 @@
                         <div class="col-md-6">
                         <x-forms.file allowedFileExtensions="png jpg jpeg svg bmp" class="mr-0 mr-lg-2 mr-md-2 cropper"
                             :fieldLabel="__('Attachments')" fieldName="photo" fieldId="photo"
-                            fieldHeight="119" :popover="__('File')" />
-                            <video id="camera-preview" width="100%" autoplay style="display: none;"></video>
+                            fieldHeight="119" :popover="__('File')" style="display: none;" />
+                            <img id="photo-preview" src="" alt="Preview Foto" style="display: none; width: 100%; max-height: 300px; margin-top: 47px;">
+                            <video id="camera-preview" width="100%" autoplay style="display: none; margin-top: 47px;"></video>
                             <canvas id="camera-canvas" style="display: none;"></canvas>
                         </div>
                     </div>
@@ -145,6 +146,10 @@
     document.getElementById('open-camera').addEventListener('click', function() {
         let video = document.getElementById('camera-preview');
         let takePhotoBtn = document.getElementById('take-photo');
+        let photoPreview = document.getElementById('photo-preview');
+
+        photoPreview.src = '';
+        photoPreview.style.display = 'none';
 
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
             .then(function(stream) {
@@ -161,6 +166,7 @@
         let video = document.getElementById('camera-preview');
         let canvas = document.getElementById('camera-canvas');
         let context = canvas.getContext('2d');
+        let photoPreview = document.getElementById('photo-preview');
 
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -173,6 +179,10 @@
             let dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             fileInput.files = dataTransfer.files;
+
+            let imageUrl = URL.createObjectURL(blob);
+            photoPreview.src = imageUrl;
+            photoPreview.style.display = 'block';
         });
 
         let stream = video.srcObject;

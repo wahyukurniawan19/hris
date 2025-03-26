@@ -238,6 +238,7 @@ return [
          * Package Service Providers...
          */
 
+        Modules\Payroll\Providers\PayrollServiceProvider::class,
         /*
          * Application Service Providers...
          */
