@@ -110,7 +110,9 @@ class CustomModuleController extends AccountBaseController
 
         if ($validateModule ['status'] == true) {
             // Move files to Modules if modules belongs to this product
-            File::moveDirectory(storage_path('app') . '/Modules/' . $moduleName, base_path() . '/Modules/' . $moduleName, true);
+            $source = storage_path('app' . DIRECTORY_SEPARATOR . 'Modules' . DIRECTORY_SEPARATOR . $moduleName);
+            $destination = base_path('Modules' . DIRECTORY_SEPARATOR . $moduleName);
+            File::moveDirectory($source, $destination, true);
 
             cache()->forget('laravel-modules');
 
@@ -329,7 +331,7 @@ class CustomModuleController extends AccountBaseController
                 $this->modulePurchaseVerified(strtolower($moduleName), $setting->purchase_code);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             logger($e->getMessage());
         }
     }
