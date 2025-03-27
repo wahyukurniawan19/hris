@@ -1167,7 +1167,12 @@ class EmployeeController extends AccountBaseController
         $employee->marriage_anniversary_date = $request->marriage_anniversary_date ? companyToYmd($request->marriage_anniversary_date) : null;
         $employee->employment_type = $request->employment_type;
         $employee->internship_end_date = $request->internship_end_date ? companyToYmd($request->internship_end_date) : null;
-        $employee->contract_end_date = $request->contract_end_date ? companyToYmd($request->contract_end_date) : null;
+        $employee->npwp = isset($request->employeeNpwp) ? $request->employeeNpwp : null;
+        $employee->nik = isset($request->employeeNik) ? $request->employeeNik : null;
+        $employee->religion = isset($request->employeeAgama) ? $request->employeeAgama : null;
+        $employee->place_birth = isset($request->employeeTempatLahir) ? $request->employeeTempatLahir : null;
+        $employee->bpjs_ks = isset($request->employeeBpjsKs) ? $request->employeeBpjsKs : null;
+        $employee->bpjs_kt = isset($request->employeeBpjsKt) ? $request->employeeBpjsKt : null;
     }
 
     public function importMember()

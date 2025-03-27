@@ -160,9 +160,30 @@ $addDepartmentPermission = user()->permission('add_department');
                         </x-forms.select>
                     </div>
                     <div class="col-md-4">
+                        <x-forms.text fieldId="employeeNpwp" :fieldLabel="__('modules.employees.employeeNpwp')"
+                            fieldName="employeeNpwp" :fieldValue="$employee->employeeDetail->npwp" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+                    <div class="col-md-4">
+                        <x-forms.text fieldId="employeeNik" :fieldLabel="__('modules.employees.employeeNik')"
+                            fieldName="employeeNik" :fieldValue="$employee->employeeDetail->nik" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+
+                    <div class="col-md-4">
+                        <x-forms.text fieldId="employeeAgama" :fieldLabel="__('modules.employees.employeeAgama')"
+                            fieldName="employeeAgama" :fieldValue="$employee->employeeDetail->religion" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+                    <div class="col-md-4">
                         <x-forms.datepicker fieldId="joining_date" :fieldLabel="__('modules.employees.joiningDate')"
                             fieldName="joining_date" :fieldPlaceholder="__('placeholders.date')" fieldRequired="true"
                             :fieldValue="$employee->employeeDetail->joining_date->format(company()->date_format)" />
+                    </div>
+                    <div class="col-md-4">
+                        <x-forms.text fieldId="employeeTempatLahir" :fieldLabel="__('modules.employees.employeeTempatLahir')"
+                            fieldName="employeeTempatLahir" :fieldValue="$employee->employeeDetail->place_birth" fieldRequired="true">
+                        </x-forms.text>
                     </div>
                     <div class="col-md-4">
                         <x-forms.datepicker fieldId="date_of_birth" :fieldLabel="__('modules.employees.dateOfBirth')"
@@ -345,7 +366,6 @@ $addDepartmentPermission = user()->permission('add_department');
                             fieldName="employment_type" :fieldPlaceholder="__('placeholders.date')">
                             <option value="">--</option>
                             <option value="full_time" @if($employee->employeeDetail->employment_type == 'full_time') selected @endif>@lang('app.fullTime')</option>
-                            <option value="part_time" @if($employee->employeeDetail->employment_type == 'part_time') selected @endif>@lang('app.partTime')</option>
                             <option value="on_contract" @if($employee->employeeDetail->employment_type == 'on_contract') selected @endif>@lang('app.onContract')</option>
                             <option value="internship" @if($employee->employeeDetail->employment_type == 'internship') selected @endif>@lang('app.internship')</option>
                             <option value="trainee" @if($employee->employeeDetail->employment_type == 'trainee') selected @endif>@lang('app.trainee')</option>
@@ -364,6 +384,17 @@ $addDepartmentPermission = user()->permission('add_department');
                             :fieldValue="$employee->employeeDetail->contract_end_date ? Carbon\Carbon::parse($employee->employeeDetail->contract_end_date)->format(company()->date_format) : '' "/>
                     </div>
 
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeBpjsKs" :fieldLabel="__('modules.employees.employeeBpjsKs')"
+                            fieldName="employeeBpjsKs" :fieldValue="$employee->employeeDetail->bpjs_ks">
+                        </x-forms.text>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeBpjsKt" :fieldLabel="__('modules.employees.employeeBpjsKt')"
+                            fieldName="employeeBpjsKt" :fieldValue="$employee->employeeDetail->bpjs_kt">
+                        </x-forms.text>
+                    </div>
                     <div class="col-lg-3 col-md-6">
                         <x-forms.select fieldId="marital_status" :fieldLabel="__('modules.employees.maritalStatus')"
                             fieldName="marital_status" :fieldPlaceholder="__('placeholders.date')">

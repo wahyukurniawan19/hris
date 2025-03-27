@@ -157,6 +157,26 @@ $addDepartmentPermission = user()->permission('add_department');
                             :fieldValue="now(company()->timezone)->format(company()->date_format)" />
                     </div>
                     <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeNpwp" :fieldLabel="__('modules.employees.employeeNpwp')"
+                            fieldName="employeeNpwp" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeNik" :fieldLabel="__('modules.employees.employeeNik')"
+                            fieldName="employeeNik" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeAgama" :fieldLabel="__('modules.employees.employeeAgama')"
+                            fieldName="employeeAgama" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeTempatLahir" :fieldLabel="__('modules.employees.employeeTempatLahir')"
+                            fieldName="employeeTempatLahir" fieldRequired="true">
+                        </x-forms.text>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
                         <x-forms.datepicker fieldId="date_of_birth" :fieldLabel="__('modules.employees.dateOfBirth')"
                             fieldName="date_of_birth" :fieldPlaceholder="__('placeholders.date')" />
                     </div>
@@ -306,7 +326,6 @@ $addDepartmentPermission = user()->permission('add_department');
                             fieldName="employment_type" :fieldPlaceholder="__('placeholders.date')">
                             <option value="">--</option>
                             <option value="full_time">@lang('app.fullTime')</option>
-                            <option value="part_time">@lang('app.partTime')</option>
                             <option value="on_contract">@lang('app.onContract')</option>
                             <option value="internship">@lang('app.internship')</option>
                             <option value="trainee">@lang('app.trainee')</option>
@@ -320,6 +339,18 @@ $addDepartmentPermission = user()->permission('add_department');
                     <div class="col-lg-3 col-md-6 d-none contract-date">
                         <x-forms.datepicker fieldId="contract_end_date" :fieldLabel="__('modules.employees.contractEndDate')"
                             fieldName="contract_end_date" :fieldPlaceholder="__('placeholders.date')"/>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeBpjsKs" :fieldLabel="__('modules.employees.employeeBpjsKs')"
+                            fieldName="employeeBpjsKs">
+                        </x-forms.text>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeBpjsKt" :fieldLabel="__('modules.employees.employeeBpjsKt')"
+                            fieldName="employeeBpjsKt">
+                        </x-forms.text>
                     </div>
 
                     <div class="col-lg-3 col-md-6">
