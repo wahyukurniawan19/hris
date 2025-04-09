@@ -260,21 +260,23 @@
         });
 
         $('#attendance-data').on('click', '.edit-attendance', function (event) {
-            var attendanceDate = $(this).data('attendance-date');
-            var userData = $(this).closest('tr').children('td:first');
+            var fullDate = $(this).data('attendance-date');
             var userID = $(this).data('user-id');
-            var year = $('#year').val();
-            var month = $('#month').val();
+            var parts = fullDate.split('-');
+            var year = parts[0];
+            var month = parts[1];
+            var day = parts[2];
 
             var url = "{{ route('attendances.mark', [':userid', ':day', ':month', ':year']) }}";
             url = url.replace(':userid', userID);
-            url = url.replace(':day', attendanceDate);
+            url = url.replace(':day', day);
             url = url.replace(':month', month);
             url = url.replace(':year', year);
 
             $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
             $.ajaxModal(MODAL_XL, url);
         });
+
 
         function editAttendance(id) {
             var url = "{{ route('attendances.edit', [':id']) }}";
