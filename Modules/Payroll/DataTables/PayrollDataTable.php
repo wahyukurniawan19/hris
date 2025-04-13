@@ -81,8 +81,8 @@ class PayrollDataTable extends BaseDataTable
                     return $start . ' ' . __('app.to') . ' ' . $end;
                 }
 
-                $start = Carbon::parse(Carbon::parse('01-' . $row->month . '-' . $row->year))->startOfMonth()->toDateString();
-                $end = Carbon::parse(Carbon::parse('01-' . $row->month . '-' . $row->year))->endOfMonth()->toDateString();
+                $start = Carbon::createFromDate($row->year, $row->month, 21)->startOfDay()->toDateString();
+                $end = Carbon::createFromDate($row->year, $row->month, 21)->addMonth()->day(20)->endOfDay()->toDateString();
 
                 return $start . ' ' . __('app.to') . ' ' . $end;
             })
@@ -143,10 +143,11 @@ class PayrollDataTable extends BaseDataTable
 
         if (!is_null($request->month) && $request->month != 'null' && $request->month != '') {
             $explode = explode(' ', $request->month);
-            $startDate = trim($explode[0]);
-            $endDate = trim($explode[1]);
+            $startDate = Carbon::parse(trim($explode[0]))->day(21)->startOfDay();
+            $endDate = $startDate->copy()->addMonth()->day(20)->endOfDay();
+            $startDateFormatted = $startDate->format('Y-m-d');
+            $endDateFormatted = $endDate->format('Y-m-d');
         }
-
         $users = User::withoutGlobalScope(ActiveScope::class)
             ->join('role_user', 'role_user.user_id', '=', 'users.id')
             ->leftJoin('employee_details', 'employee_details.user_id', '=', 'users.id')
@@ -161,8 +162,8 @@ class PayrollDataTable extends BaseDataTable
             ->where('salary_slips.year', $request->year);
 
         if (!is_null($startDate) && !is_null($endDate)) {
-            $users = $users->whereRaw('Date(salary_slips.salary_from) = ?', [$startDate]);
-            $users = $users->whereRaw('Date(salary_slips.salary_to) = ?', [$endDate]);
+            $users = $users->whereRaw('Date(salary_slips.salary_from) = ?', [$startDateFormatted]);
+            $users = $users->whereRaw('Date(salary_slips.salary_to) = ?', [$endDateFormatted]);
         }
 
         if ($this->viewPayrollPermission == 'owned') {

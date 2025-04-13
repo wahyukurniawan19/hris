@@ -117,7 +117,7 @@ return array(
         'totalTdsPaid' => 'Total TDS Paid',
         'salarySlipData' => 'Salary Slip Data',
         'grossSalary' => 'Gross Salary',
-        'ctc' => 'CTC',
+        'ctc' => 'Gross Salary',
         'employeeHourlyRate' => 'Employee Hourly Rate',
         'hourlyRate' => 'Hourly Rate ( :currency )',
         'overtimeRequest' => 'Overtime Request',
