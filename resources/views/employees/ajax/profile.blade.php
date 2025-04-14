@@ -223,6 +223,12 @@ $viewAppreciationPermission = user()->permission('view_appreciation');
                                 <x-cards.data-row :label="__('modules.employees.noticePeriodEndDate')"
                                 :value="$employee->employeeDetail->notice_period_end_date ? Carbon\Carbon::parse($employee->employeeDetail->notice_period_end_date)->translatedFormat(company()->date_format) : '--'" />
 
+                                <x-cards.data-row :label="__('modules.employees.employeeLevel')"
+                                :value="$employee?->employeeDetail?->level_grade ? $employee->employeeDetail->level_grade : '--'" />
+
+                                <x-cards.data-row :label="__('modules.employees.employeePTKP')"
+                                :value="$employee?->employeeDetail?->ptkp ? $employee->employeeDetail->ptkp : '--'" />
+
                                 <x-cards.data-row :label="__('modules.employees.maritalStatus')"
                                 :value="$employee?->employeeDetail?->marital_status ? $employee->employeeDetail->marital_status->label() : '--'" />
 

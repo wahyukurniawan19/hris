@@ -29,6 +29,7 @@ use Modules\Payroll\Entities\EmployeeMonthlySalary;
 use Modules\Payroll\Entities\EmployeeVariableComponent;
 use Modules\Payroll\Entities\OvertimeRequest;
 use Modules\Payroll\Notifications\SalaryStatusEmail;
+use App\Models\Lookup;
 
 class PayrollController extends AccountBaseController
 {
@@ -312,6 +313,7 @@ class PayrollController extends AccountBaseController
 
             $this->currency = PayrollSetting::with('currency')->first();
             $this->salaryPaymentMethods = SalaryPaymentMethod::all();
+            $this->dataBank = Lookup::where('lookup_type', 'bank')->get();
 
         if (request()->ajax()) {
             $html = view('payroll::payroll.ajax.edit-modal', $this->data)->render();
@@ -447,6 +449,8 @@ class PayrollController extends AccountBaseController
         $salarySlip->gross_salary = round(($grossEarning), 2);
         $salarySlip->last_updated_by = user()->id;
         $salarySlip->fixed_allowance = $request->fixed_allowance_input;
+        $salarySlip->bank = $request->employeeBankAccount;
+        $salarySlip->no_rekening = $request->employeeBankNumber;
         $salarySlip->save();
 
         return Reply::redirect(route('payroll.show', $salarySlip->id), __('messages.updateSuccess'));

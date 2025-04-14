@@ -705,6 +705,7 @@ class AttendanceController extends AccountBaseController
         $attendance->working_from = $request->working_from;
         $attendance->work_from_type = $request->work_from_type;
         $attendance->location_id = $request->location;
+        $attendance->notes = isset($request->deskripsi) ? $request->deskripsi : 'null';
         $attendance->late = ($request->has('late')) ? 'yes' : 'no';
         $attendance->half_day = ($request->has('halfday')) ? 'yes' : 'no';
         $attendance->half_day_type = ($request->has('half_day_duration') && $request->has('halfday')) ? $request->half_day_duration : null;
@@ -838,6 +839,7 @@ class AttendanceController extends AccountBaseController
                 'employee_shift_id' => $employeeShiftId,
                 'shift_start_time' => $shiftStartTime,
                 'shift_end_time' => $shiftEndTime,
+                'notes' => isset($request->deskripsi )? $request->deskripsi : 'null',
                 'late' => ($request->has('late')) ? 'yes' : 'no',
                 'half_day' => ($request->has('halfday')) ? 'yes' : 'no',
                 'half_day_type' => ($request->has('half_day_duration') && $request->has('halfday')) ? $request->half_day_duration : null
@@ -871,6 +873,7 @@ class AttendanceController extends AccountBaseController
                     'shift_start_time' => $shiftStartTime,
                     'shift_end_time' => $shiftEndTime,
                     'work_from_type' => $request->work_from_type,
+                    'notes' => isset($request->deskripsi )? $request->deskripsi : 'null',
                     'half_day' => ($request->has('halfday')) ? 'yes' : 'no',
                     'half_day_type' => ($request->has('half_day_duration') && $request->has('halfday')) ? $request->half_day_duration : null
                 ]);

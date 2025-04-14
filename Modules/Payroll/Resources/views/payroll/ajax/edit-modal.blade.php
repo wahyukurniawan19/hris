@@ -55,6 +55,23 @@
                         </x-forms.select>
                     </div>
 
+                    <div class="col-md-3" id="bank-account-field" style="display: none;">
+                        <x-forms.select fieldId="employeeBankAccount" :fieldLabel="__('modules.employees.employeeBankAccount')"
+                            fieldName="employeeBankAccount" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataBank as $bank)
+                                <option @selected($salarySlip->user->employeeDetail->bank == $bank->lookup_nama)
+                                    value="{{ $bank->lookup_nama }}">{{ $bank->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+
+                    <div class="col-md-3" id="bank-number-field" style="display: none;">
+                        <x-forms.text :fieldLabel="__('modules.employees.employeeBankNumber')"
+                        fieldName="employeeBankNumber"
+                        fieldId="employeeBankNumber"
+                        :fieldValue="$salarySlip->user->employeeDetail->no_rekening" />
+                    </div>
+                    
                     <div class="col-md-3">
                         <x-forms.select fieldId="status" :fieldLabel="__('app.status')" fieldName="status"
                                         search="true">
@@ -279,7 +296,8 @@
 <script>
 
     $(document).ready(function () {
-
+        toggleBankAccountField(); 
+        $('#salary_payment_method_id').on('change', toggleBankAccountField)
         const dp1 = datepicker('#paid_on', {
             position: 'bl',
             ...datepickerConfig
@@ -547,5 +565,18 @@
             return number;
         }
     });
+
+    function toggleBankAccountField() {
+        const selected = $('#salary_payment_method_id option:selected').text().trim().toLowerCase();
+
+        if (selected === 'bank transfer') {
+
+            $('#bank-number-field').show();
+            $('#bank-account-field').show();
+        } else {
+            $('#bank-number-field').hide();
+            $('#bank-account-field').hide();
+        }
+    }
 
 </script>

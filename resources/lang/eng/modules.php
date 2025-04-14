@@ -359,7 +359,11 @@ return array(
         'employeeAgama' => 'Religion',
         'employeeTempatLahir' => 'Place of Birth',
         'employeeBpjsKs' => 'BPJS Kesehatan',
-        'employeeBpjsKt' => 'BPJS Ketenagakerjaan'
+        'employeeBpjsKt' => 'BPJS Ketenagakerjaan',
+        'employeeLevel' => 'Level/Grade',
+        'employeePTKP' => 'PTKP',
+        'employeeBankAccount' => 'Bank',
+        'employeeBankNumber' => 'No. Rekening'
 
     ),
     'projects' => array(

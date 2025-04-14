@@ -161,7 +161,7 @@ $addDepartmentPermission = user()->permission('add_department');
                     </div>
                     <div class="col-md-4">
                         <x-forms.text fieldId="employeeNpwp" :fieldLabel="__('modules.employees.employeeNpwp')"
-                            fieldName="employeeNpwp" :fieldValue="$employee->employeeDetail->npwp" fieldRequired="true">
+                            fieldName="employeeNpwp" :fieldValue="$employee->employeeDetail->npwp">
                         </x-forms.text>
                     </div>
                     <div class="col-md-4">
@@ -171,9 +171,13 @@ $addDepartmentPermission = user()->permission('add_department');
                     </div>
 
                     <div class="col-md-4">
-                        <x-forms.text fieldId="employeeAgama" :fieldLabel="__('modules.employees.employeeAgama')"
-                            fieldName="employeeAgama" :fieldValue="$employee->employeeDetail->religion" fieldRequired="true">
-                        </x-forms.text>
+                        <x-forms.select fieldId="employeeAgama" :fieldLabel="__('modules.employees.employeeAgama')"
+                            fieldName="employeeAgama" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataAgama as $agama)
+                                <option @selected($employee->employeeDetail->religion == $agama->lookup_value)
+                                    value="{{ $agama->lookup_value }}">{{ $agama->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
                     </div>
                     <div class="col-md-4">
                         <x-forms.datepicker fieldId="joining_date" :fieldLabel="__('modules.employees.joiningDate')"
@@ -385,6 +389,26 @@ $addDepartmentPermission = user()->permission('add_department');
                     </div>
 
                     <div class="col-lg-3 col-md-6">
+                        <x-forms.select fieldId="employeeLevel" :fieldLabel="__('modules.employees.employeeLevel')"
+                            fieldName="employeeLevel" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($level_grade as $level)
+                                <option @selected($employee->employeeDetail->level_grade == $level->lookup_value)
+                                    value="{{ $level->lookup_value }}">{{ $level->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.select fieldId="employeePTKP" :fieldLabel="__('modules.employees.employeePTKP')"
+                            fieldName="employeePTKP" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataPtkp as $ptkp)
+                                <option @selected($employee->employeeDetail->ptkp == $ptkp->lookup_value)
+                                    value="{{ $ptkp->lookup_value }}">{{ $ptkp->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
                         <x-forms.text fieldId="employeeBpjsKs" :fieldLabel="__('modules.employees.employeeBpjsKs')"
                             fieldName="employeeBpjsKs" :fieldValue="$employee->employeeDetail->bpjs_ks">
                         </x-forms.text>
@@ -426,7 +450,20 @@ $addDepartmentPermission = user()->permission('add_department');
                             :fieldValue="$employee->employeeDetail->marriage_anniversary_date ? Carbon\Carbon::parse($employee->employeeDetail->marriage_anniversary_date)->format(company()->date_format) : '' " />
                     </div>
 
-
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.select fieldId="employeeBankAccount" :fieldLabel="__('modules.employees.employeeBankAccount')"
+                            fieldName="employeeBankAccount" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataBank as $bank)
+                                <option @selected($employee->employeeDetail->bank == $bank->lookup_nama)
+                                    value="{{ $bank->lookup_nama }}">{{ $bank->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeBankNumber" :fieldLabel="__('modules.employees.employeeBankNumber')"
+                            fieldName="employeeBankNumber" :fieldValue="$employee->employeeDetail->no_rekening">
+                        </x-forms.text>
+                    </div>
                 </div>
                 <div class="row p-20 border-top-grey">
                     {{-- Users cannot change their own status --}}
