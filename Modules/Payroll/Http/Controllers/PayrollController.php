@@ -490,6 +490,8 @@ class PayrollController extends AccountBaseController
         $payrollCycleData = PayrollCycle::find($payrollCycle);
         $startDate = Carbon::parse($month[0]);
         $endDate = Carbon::parse($month[1]);
+        $salaryStartDate = Carbon::parse($month[0])->day(21)->startOfDay();
+        $salaryEndDate = $startDate->copy()->addMonth()->day(20)->endOfDay();
         $lastDayCheck = Carbon::parse($month[1]);
         $daysInMonth = $startDate->diffInDays($lastDayCheck->addDay()); // Days by start and end date
 
@@ -548,10 +550,13 @@ class PayrollController extends AccountBaseController
             $employeeDetails = EmployeeDetails::where('user_id', $userId)->first();
             $joiningDate = Carbon::parse($employeeDetails->joining_date)->setTimezone($this->company->timezone);
             $exitDate = (!is_null($employeeDetails->last_date)) ? Carbon::parse($employeeDetails->last_date)->setTimezone($this->company->timezone) : null;
-            $payDays = $daysInMonth;
 
             if ($endDate->greaterThan($joiningDate)) {
-                $payDays = $this->countAttendace($startDate, $endDate, $userId, $daysInMonth, $useAttendance, $joiningDate, $exitDate);
+                if(strpos($employeeDetails->level_grade, 'V') === false){
+                    $payDays = $useAttendance ? $this->countAttendace($salaryStartDate, $salaryEndDate, $userId, $daysInMonth, $useAttendance, $joiningDate, $exitDate) : 21;
+                }else{
+                    $payDays = 21;
+                }
 
                 // Check Joining date of the employee
                 if(!$useAttendance && $joiningDate->greaterThan($startDate))
@@ -567,13 +572,8 @@ class PayrollController extends AccountBaseController
                     $payDays = ($payDays - $daysDifference);
                 }
 
-                $monthCur = $endDate->month;
-                $curMonthDays = Carbon::parse('01-' . $monthCur . '-' . $year)->daysInMonth;
                 $monthlySalary = EmployeeMonthlySalary::employeeNetSalary($userId, $endDate);
-
-                $curMonthDays = ($curMonthDays != 30 && $payrollCycleData->cycle == 'semimonthly') ? 30 : $curMonthDays;
-
-                $perDaySalary = $monthlySalary['netSalary'] / $curMonthDays;
+                $perDaySalary = $monthlySalary['netSalary'] / 21;
                 $payableSalary = $perDaySalary * $payDays;
 
                 $basicSalary = $payableSalary;
@@ -711,7 +711,7 @@ class PayrollController extends AccountBaseController
                 $unpaidDaysAmount = 0;
 
                 if($useAttendance){
-                    $unpaidDayCount = $daysInMonth - $payDays;
+                    $unpaidDayCount = 21 - $payDays;
                     $unPaidAmount = round(($unpaidDayCount * $perDaySalary), 2);
 
                     if($unPaidAmount > 0){
@@ -738,8 +738,8 @@ class PayrollController extends AccountBaseController
                     'total_deductions' => round(($deductionsTotal), 2),
                     'month' => $startDate->month,
                     'payroll_cycle_id' => $payrollCycle,
-                    'salary_from' => $startDate->format('Y-m-d'),
-                    'salary_to' => $endDate->format('Y-m-d'),
+                    'salary_from' => $salaryStartDate->format('Y-m-d'),
+                    'salary_to' => $salaryEndDate->format('Y-m-d'),
                     'year' => $request->year,
                     'salary_json' => $salaryComponentsJson,
                     'expense_claims' => $expenseTotal,
@@ -789,14 +789,14 @@ class PayrollController extends AccountBaseController
             if ($payrollMonthEndDate->greaterThan($incrementDate)) {
                 if (is_null($lastIncrement)) {
                     $payDays = $incrementDate->diffInDays($joiningDate, true);
-                    $perDaySalary = ($initialSalary / 30); /*30 is taken as no of days in a month*/
+                    $perDaySalary = ($initialSalary / 21); /*30 is taken as no of days in a month*/
                     $totalEarning = $payDays * $perDaySalary;
                     $lastIncrement = $incrementDate;
                     $currentSalary = $increment->amount + $initialSalary;
                 }
                 else {
                     $payDays = $incrementDate->diffInDays($lastIncrement, true);
-                    $perDaySalary = ($currentSalary / 30);
+                    $perDaySalary = ($currentSalary / 21);
                     $totalEarning = $totalEarning + ($payDays * $perDaySalary);
                     $lastIncrement = $incrementDate;
                     $currentSalary = $increment->amount + $currentSalary;
@@ -806,7 +806,7 @@ class PayrollController extends AccountBaseController
 
         if (!is_null($lastIncrement)) {
             $payDays = $financialyearEnd->diffInDays($lastIncrement, true);
-            $perDaySalary = ($currentSalary / 30);
+            $perDaySalary = ($currentSalary / 21);
             $totalEarning = $totalEarning + ($payDays * $perDaySalary);
         }
         else {
@@ -1426,11 +1426,14 @@ class PayrollController extends AccountBaseController
 
     public function countFullDaysPresentByUser($startDate, $endDate, $userId, $holidayData)
     {
-        // $totalPresent = DB::select('SELECT count(DISTINCT DATE(attendances.clock_in_time) ) as presentCount from attendances where DATE(attendances.clock_in_time) >= "' . $startDate . '" and DATE(attendances.clock_in_time) <= "' . $endDate . '" and user_id="' . $userId . '" and half_day = "no"');
         $totalPresent = Attendance::select(DB::raw('count(DISTINCT DATE(attendances.clock_in_time) ) as presentCount'))
-            ->where(DB::raw('DATE(attendances.clock_in_time)'), '>=', $startDate->toDateString())
-            ->where(DB::raw('DATE(attendances.clock_in_time)'), '<=', $endDate->toDateString())
+            ->whereBetween(DB::raw('DATE(clock_in_time)'), [
+                $startDate->toDateString(),
+                $endDate->toDateString()
+            ])
             ->where('half_day', 'no')
+            ->whereNotNull('clock_in_time')
+            ->whereNotNull('clock_out_time')
             ->where('user_id', $userId)
             ->whereNotIn(DB::raw('DATE(attendances.clock_in_time)'), $holidayData)->get();
 
@@ -1439,14 +1442,18 @@ class PayrollController extends AccountBaseController
 
     public function countHalfDaysPresentByUser($startDate, $endDate, $userId, $holidayData)
     {
-        // $totalPresent = DB::select('SELECT count(DISTINCT DATE(attendances.clock_in_time) ) as presentCount from attendances where DATE(attendances.clock_in_time) >= "' . $startDate . '" and DATE(attendances.clock_in_time) <= "' . $endDate . '" and user_id="' . $userId . '" and half_day = "yes"');
-        $totalPresent = Attendance::select(DB::raw('count(DISTINCT DATE(attendances.clock_in_time) ) as presentCount'))
-            ->where(DB::raw('DATE(attendances.clock_in_time)'), '>=', $startDate->toDateString())
-            ->where(DB::raw('DATE(attendances.clock_in_time)'), '<=', $endDate->toDateString())
-            ->where('half_day', 'yes')
-            ->where('user_id', $userId)
-            ->whereNotIn(DB::raw('DATE(attendances.clock_in_time)'), $holidayData)->get();
-
+        $totalPresent = Attendance::select(DB::raw('count(DISTINCT DATE(COALESCE(clock_in_time, clock_out_time))) as presentCount'))
+            ->whereBetween(DB::raw('DATE(COALESCE(clock_in_time, clock_out_time))'), [
+                $startDate->toDateString(),
+                $endDate->toDateString()
+            ])
+            ->where('user_id', 1)
+            ->whereNotIn(DB::raw('DATE(COALESCE(clock_in_time, clock_out_time))'), $holidayData)
+            ->whereRaw("
+                (half_day = 'no' AND (clock_in_time IS NULL OR clock_out_time IS NULL))
+                OR half_day = 'yes'
+            ")
+            ->get();
         return (isset($totalPresent[0]->presentCount)) ? ($totalPresent[0]->presentCount/2) : 0;
     }
 
