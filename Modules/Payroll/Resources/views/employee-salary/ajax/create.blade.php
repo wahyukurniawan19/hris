@@ -75,7 +75,7 @@
                                     <div class="col-md-3">
 
                                         <x-forms.input-group>
-                                            <input type="number" value="50" onmouseout="changeClc()" name="basic_salary" id="basic_value"
+                                            <input type="number" value="100" onmouseout="changeClc()" name="basic_salary" id="basic_value"
                                                 class="form-control height-35 f-15" style="width:30%">
 
                                         <select name="basic_value" id="basic-type" onchange="selectType(this.value)" class="form-control select-picker" data-size="8">

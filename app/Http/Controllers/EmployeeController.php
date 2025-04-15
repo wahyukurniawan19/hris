@@ -28,6 +28,7 @@ use App\Models\EmployeeActivity;
 use App\Models\EmployeeDetails;
 use App\Models\EmployeeSkill;
 use App\Models\LanguageSetting;
+use App\Models\Lookup;
 use App\Models\Leave;
 use App\Models\LeaveType;
 use App\Models\Module;
@@ -118,6 +119,12 @@ class EmployeeController extends AccountBaseController
         $this->checkifExistEmployeeId = EmployeeDetails::select('id')->where('employee_id', ($this->lastEmployeeID + 1))->first();
         $this->employees = User::allEmployees(null, true);
         $this->languages = LanguageSetting::where('status', 'enabled')->get();
+        $lookupData = $this->getLookupData(['level_grade', 'ptkp', 'bank','agama']);
+
+        $this->level_grade = $lookupData['level_grade'] ?? collect();
+        $this->dataPtkp = $lookupData['ptkp'] ?? collect();
+        $this->dataBank = $lookupData['bank'] ?? collect();
+        $this->dataAgama = $lookupData['agama'] ?? collect();
         $this->salutations = Salutation::cases();
         $this->companyAddresses = CompanyAddress::all();
 
@@ -402,6 +409,12 @@ class EmployeeController extends AccountBaseController
         $this->designations = Designation::allDesignations();
         $this->countries = countries();
         $this->languages = LanguageSetting::where('status', 'enabled')->get();
+        $lookupData = $this->getLookupData(['level_grade', 'ptkp', 'bank','agama']);
+
+        $this->level_grade = $lookupData['level_grade'] ?? collect();
+        $this->dataPtkp = $lookupData['ptkp'] ?? collect();
+        $this->dataBank = $lookupData['bank'] ?? collect();
+        $this->dataAgama = $lookupData['agama'] ?? collect();
         $exceptUsers = [$id];
         $this->roles = Role::where('name', '<>', 'client')->get();
         $this->userRoles = $this->employee->roles->pluck('name')->toArray();
@@ -1173,6 +1186,10 @@ class EmployeeController extends AccountBaseController
         $employee->place_birth = isset($request->employeeTempatLahir) ? $request->employeeTempatLahir : null;
         $employee->bpjs_ks = isset($request->employeeBpjsKs) ? $request->employeeBpjsKs : null;
         $employee->bpjs_kt = isset($request->employeeBpjsKt) ? $request->employeeBpjsKt : null;
+        $employee->level_grade = isset($request->employeeLevel) ? $request->employeeLevel : null;
+        $employee->ptkp = isset($request->employeePTKP) ? $request->employeePTKP : null;
+        $employee->bank = isset($request->employeeBankAccount) ? $request->employeeBankAccount : null;
+        $employee->no_rekening = isset($request->employeeBankNumber) ? $request->employeeBankNumber : null;
     }
 
     public function importMember()
@@ -1209,6 +1226,11 @@ class EmployeeController extends AccountBaseController
         $batch = $this->importJobProcess($request, EmployeeImport::class, ImportEmployeeJob::class);
 
         return Reply::successWithData(__('messages.importProcessStart'), ['batch' => $batch]);
+    }
+
+    private function getLookupData(array $types)
+    {
+        return Lookup::whereIn('lookup_type', $types)->get()->groupBy('lookup_type');
     }
 
 }

@@ -50,11 +50,8 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
                             </div>
                         </div>
 
-                        <div class="col-lg-3 col-md-6">
-                            <x-forms.text class="a-timepicker" :fieldLabel="__('modules.attendance.clock_in_ip')"
-                                :fieldPlaceholder="__('placeholders.hours')" fieldName="clock_in_ip"
-                                fieldId="clock-in-ip" :fieldValue="$row->clock_in_ip ?? request()->ip()" />
-                        </div>
+                        <input type="hidden" name="clock_in_ip" id="clock-in-ip" value="{{ $row->clock_in_ip ?? request()->ip() }}">
+
 
                         @if ($row->total_clock_in == 0)
                             <div class="col-lg-4 col-md-6">
@@ -82,12 +79,8 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
                             </div>
                         </div>
 
-                        <div class="col-lg-3 col-md-4">
-                            <x-forms.text :fieldLabel="__('modules.attendance.clock_out_ip')"
-                                :fieldPlaceholder="__('placeholders.hours')" fieldName="clock_out_ip"
-                                :fieldId="'clock-out-ip-'.$row->id"
-                                :fieldValue="$row->clock_out_ip ?? request()->ip()" />
-                        </div>
+                        <input type="hidden" name="clock_out_ip" id="clock-out-ip" value="{{ $row->clock_out_ip ?? request()->ip() }}">
+
 
                         @if ($row->total_clock_in == 0)
                             <div class="col-lg-2 col-md-6">
@@ -121,13 +114,10 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
                     <div class="row">
 
                         <div class="col-lg-4 col-md-6">
-                            <x-forms.select fieldId="location" :fieldLabel="__('app.location')" fieldName="location"
-                            search="true">
-                                @foreach ($location as $locations)
-                                    <option @if (($row->location_id == $locations->id) || (is_null($row->location_id) && $locations->is_default == 1)) selected @endif value="{{ $locations->id }}">
-                                        {{ $locations->location }}</option>
-                                @endforeach
-                            </x-forms.select>
+                            <x-forms.text fieldId="location" :fieldLabel="__('Location')"
+                                fieldName="location" :fieldPlaceholder="__('Location')" :fieldValue="$row->location ?? ''"
+                                :fieldReadOnly="true">
+                            </x-forms.text>
                         </div>
 
                         <div class="col-lg-4 col-md-6">
@@ -147,6 +137,16 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
                             </x-forms.text>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6" id="deskripsi">
+                            <x-forms.textarea fieldId="deskripsi" 
+                                              :fieldLabel="__('modules.offlinePayment.description')" 
+                                              fieldName="deskripsi" 
+                                              fieldRequired="false" 
+                                              :fieldValue="$row->working_from">
+                            </x-forms.textarea>
+                        </div>
+                    </div>                    
                 </x-form>
             @elseif($attendanceSettings->shift_name == 'Day Off')
                 <div class="alert alert-info mt-3">@lang('modules.attendance.dayOff')</div>
@@ -165,7 +165,7 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
     $('.select-picker').selectpicker();
 
     $(document).ready(function() {
-
+        setCurrentLocation();
         if ($('#halfday').is(':checked')) {
             $('#half_day_section').show();
         } else {
@@ -290,5 +290,21 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
         });
     });
 
+    function setCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var lat = document.getElementById("current-latitude").value;
+                var lon = document.getElementById("current-longitude").value;
 
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('location').value = data.display_name;
+                    })
+                    .catch(error => console.log('Error mendapatkan lokasi:', error));
+            }, function (error) {
+                console.log('Gagal mendapatkan lokasi:', error);
+            });
+        }
+    }
 </script>

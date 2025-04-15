@@ -47,6 +47,10 @@
                                 :value="(!is_null($salarySlip->user->employeeDetail->department)) ? $salarySlip->user->employeeDetail->department->team_name : '-'" />
                             <x-cards.data-row :label="__('payroll::modules.payroll.salaryPaymentMethod')"
                                 :value="($salarySlip->salary_payment_method_id) ? $salarySlip->salary_payment_method->payment_method : '--'" />
+                            @if(optional($salarySlip->salary_payment_method)->payment_method === 'Bank Transfer')
+                                <x-cards.data-row :label="__('modules.employees.employeeBankAccount')"
+                                    :value="($salarySlip->bank) ? $salarySlip->bank . ' - ' . $salarySlip->no_rekening : '--'" />
+                            @endif
                         </div>
                         <div class="col-md-4">
                             <x-cards.data-row :label="__('modules.employees.employeeId')"

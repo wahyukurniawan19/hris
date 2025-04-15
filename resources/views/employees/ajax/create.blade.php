@@ -158,7 +158,7 @@ $addDepartmentPermission = user()->permission('add_department');
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <x-forms.text fieldId="employeeNpwp" :fieldLabel="__('modules.employees.employeeNpwp')"
-                            fieldName="employeeNpwp" fieldRequired="true">
+                            fieldName="employeeNpwp">
                         </x-forms.text>
                     </div>
                     <div class="col-lg-3 col-md-6">
@@ -167,9 +167,12 @@ $addDepartmentPermission = user()->permission('add_department');
                         </x-forms.text>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <x-forms.text fieldId="employeeAgama" :fieldLabel="__('modules.employees.employeeAgama')"
-                            fieldName="employeeAgama" fieldRequired="true">
-                        </x-forms.text>
+                        <x-forms.select fieldId="employeeAgama" :fieldLabel="__('modules.employees.employeeAgama')"
+                            fieldName="employeeAgama" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataAgama as $agama)
+                                <option value="{{ $agama->lookup_value }}">{{ $agama->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <x-forms.text fieldId="employeeTempatLahir" :fieldLabel="__('modules.employees.employeeTempatLahir')"
@@ -321,6 +324,24 @@ $addDepartmentPermission = user()->permission('add_department');
                             :popover="__('messages.noticePeriodEndDate')"/>
                     </div>
 
+                     <div class="col-lg-3 col-md-6">
+                        <x-forms.select fieldId="employeeLevel" :fieldLabel="__('modules.employees.employeeLevel')"
+                            fieldName="employeeLevel" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($level_grade as $level)
+                                <option value="{{ $level->lookup_value }}">{{ $level->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.select fieldId="employeePTKP" :fieldLabel="__('modules.employees.employeePTKP')"
+                            fieldName="employeePTKP" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataPtkp as $ptkp)
+                                <option value="{{ $ptkp->lookup_value }}">{{ $ptkp->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+
                     <div class="col-lg-3 col-md-6">
                         <x-forms.select fieldId="employment_type" :fieldLabel="__('modules.employees.employmentType')"
                             fieldName="employment_type" :fieldPlaceholder="__('placeholders.date')">
@@ -379,6 +400,21 @@ $addDepartmentPermission = user()->permission('add_department');
                     <div class="col-lg-3 col-md-6 d-none marriage_date">
                         <x-forms.datepicker fieldId="marriage_anniversary_date" :fieldLabel="__('modules.employees.marriageAnniversaryDate')"
                             fieldName="marriage_anniversary_date" :fieldPlaceholder="__('placeholders.date')"/>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.select fieldId="employeeBankAccount" :fieldLabel="__('modules.employees.employeeBankAccount')"
+                            fieldName="employeeBankAccount" :fieldPlaceholder="__('placeholders.date')">
+                            @foreach ($dataBank as $bank)
+                                <option value="{{ $bank->lookup_nama }}">{{ $bank->lookup_nama }}</option>
+                            @endforeach
+                        </x-forms.select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <x-forms.text fieldId="employeeBankNumber" :fieldLabel="__('modules.employees.employeeBankNumber')"
+                            fieldName="employeeBankNumber">
+                        </x-forms.text>
                     </div>
 
                     <input type ="hidden" name="add_more" value="false" id="add_more" />
