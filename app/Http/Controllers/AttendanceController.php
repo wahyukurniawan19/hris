@@ -438,6 +438,9 @@ class AttendanceController extends AccountBaseController
             $firstAttendanceProcessed = [];
     
             foreach ($employee->attendance as $attendance) {
+                if (is_null($attendance->clock_in_time) || is_null($attendance->clock_out_time)) {
+                    continue;
+                }
                 $clockInTimeUTC = $attendance->clock_in_time->timezone(company()->timezone)->toDateTimeString();
                 $clockInTime = Carbon::createFromFormat('Y-m-d H:i:s', $clockInTimeUTC, 'UTC');
                 $startOfDayKey = $clockInTime->format('Y-m-d');
