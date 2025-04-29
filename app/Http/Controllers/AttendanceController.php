@@ -918,8 +918,8 @@ class AttendanceController extends AccountBaseController
         $ant = []; // Array For attendance Data indexed by similar date
         $dateWiseData = []; // Array For Combine Data
 
-        $startDate = Carbon::createFromFormat('d-m-Y', '01-' . $request->month . '-' . $request->year)->startOfMonth()->startOfDay();
-        $endDate = $startDate->copy()->endOfMonth()->endOfDay();
+        $startDate = Carbon::createFromFormat('d-m-Y', '21-' . $request->month . '-' . $request->year)->startOfDay();
+        $endDate = $startDate->copy()->addMonth()->day(20)->endOfDay();
         $userId = $request->userId;
 
         $attendances = Attendance::userAttendanceByDate($startDate, $endDate, $userId); // Getting Attendance Data
