@@ -85,6 +85,7 @@
                 @if (in_array('attendance', user_modules()) && $sidebarUserPermissions['view_attendance'] != 5 && $sidebarUserPermissions['view_attendance'] != 'none')
                     <x-sub-menu-item :link="route('attendances.index')" :text="__('app.menu.attendance')" />
                 @endif
+                <x-sub-menu-item :link="route('attendances.request_attendance')" :text="__('app.menu.requestAttendances')" />
                 @if (in_array('holidays', user_modules()) && $sidebarUserPermissions['view_holiday'] != 5 && $sidebarUserPermissions['view_holiday'] != 'none')
                     <x-sub-menu-item :link="route('holidays.index')" :text="__('app.menu.holiday')" />
                 @endif

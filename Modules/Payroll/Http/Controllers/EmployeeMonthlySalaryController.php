@@ -73,10 +73,6 @@ class EmployeeMonthlySalaryController extends AccountBaseController
 
         $initialSalary = EmployeeMonthlySalary::where('user_id', $request->user_id)->where('type', 'initial')->first();
 
-        if ($request->fixedAllowance < 0) {
-            return Reply::error('payroll::modules.payroll.fixedAllowanceError');
-        }
-
         if ($request->annual_salary > 0) {
             if (!is_null($initialSalary)) {
                 $salary = EmployeeMonthlySalary::find($initialSalary->id);
@@ -84,7 +80,7 @@ class EmployeeMonthlySalaryController extends AccountBaseController
                 $salary->annual_salary = $request->annual_salary;
                 $salary->basic_salary = $request->basic_salary;
                 $salary->basic_value_type = $request->basic_value;
-                $salary->fixed_allowance = $request->fixedAllowance;
+                $salary->fixed_allowance = 0;
                 $salary->amount = $request->annual_salary;
                 $salary->type = $request->type;
                 $salary->date = now()->timezone($this->company->timezone)->toDateString();
@@ -118,7 +114,7 @@ class EmployeeMonthlySalaryController extends AccountBaseController
                 $salary->annual_salary = $request->annual_salary;
                 $salary->basic_salary = $request->basic_salary;
                 $salary->basic_value_type = $request->basic_value;
-                $salary->fixed_allowance = $request->fixedAllowance;
+                $salary->fixed_allowance = 0;
                 $salary->amount = $request->annual_salary;
                 $salary->effective_annual_salary = $request->annual_salary;
                 $salary->effective_monthly_salary = $request->annual_salary;
@@ -463,7 +459,7 @@ class EmployeeMonthlySalaryController extends AccountBaseController
         $this->totalExpenses = $totalExpenses;
         $this->expenses = array_sum($totalExpenses);
 
-        $this->fixedAllowance = (($request->annualSalary) - ($this->basicSalary + array_sum($totalEarnings)));
+        $this->fixedAllowance = 0;
 
         $view = view('payroll::employee-salary.ajax.salary-component', $this->data)->render();
 
@@ -557,7 +553,7 @@ class EmployeeMonthlySalaryController extends AccountBaseController
         $this->totalExpenses = $totalExpenses;
         $this->expenses = array_sum($totalExpenses);
 
-        $this->fixedAllowance = (($request->annualSalary) - ($this->basicSalary + array_sum($totalEarnings)));
+        $this->fixedAllowance = 0;
 
         $view = view('payroll::employee-salary.ajax.salary-update-component', $this->data)->render();
 
@@ -650,7 +646,7 @@ class EmployeeMonthlySalaryController extends AccountBaseController
         $this->expenses = array_sum($totalExpenses);
 
 
-        $this->fixedAllowance = is_int($this->employeeMonthlySalary->fixed_allowance) ? $this->employeeMonthlySalary->fixed_allowance : 0;
+        $this->fixedAllowance = 0;
 
         if (request()->ajax()) {
             $this->pageTitle = __('payroll::app.menu.payroll');
@@ -668,10 +664,6 @@ class EmployeeMonthlySalaryController extends AccountBaseController
     {
         $salary = EmployeeMonthlySalary::where('id', $id)->where('type', 'initial')->first();
 
-        if ($request->fixedAllowance < 0) {
-            return Reply::error('payroll::modules.payroll.fixedAllowanceError');
-        }
-
         if ($request->annual_salary > 0) {
             $salary->user_id = $request->user_id;
             $salary->effective_annual_salary = $request->annual_salary;
@@ -679,7 +671,7 @@ class EmployeeMonthlySalaryController extends AccountBaseController
             $salary->basic_value_type = $request->basic_value;
             $salary->effective_monthly_salary = $request->annual_salary;
             $salary->type = $request->type;
-            $salary->fixed_allowance = $request->fixedAllowance;
+            $salary->fixed_allowance = 0;
             $salary->date = now()->timezone($this->company->timezone)->toDateString();
             $salary->save();
             EmployeeVariableComponent::where('monthly_salary_id', $salary->id)->delete();

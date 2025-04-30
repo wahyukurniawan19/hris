@@ -192,6 +192,7 @@ return array(
         'timeLogs' => 'Timesheet',
         'tasks' => 'Tasks',
         'attendance' => 'Attendance',
+        'requestAttendances' => 'Request Attendances',
         'estimates' => 'Estimates',
         'expenses' => 'Expenses',
         'leaves' => 'Leaves',
