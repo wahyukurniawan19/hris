@@ -181,31 +181,6 @@
                                     </div>
                                 @endforeach
                             @endif
-                            <div class="col-md-12">
-                                <div class="row my-3">
-                                    <div class="col-md-3">
-                                        <x-forms.label fieldId="" :popover="__('payroll::messages.fixedAllowanceMessage')"
-                                                    :fieldLabel="__('payroll::modules.payroll.fixedAllowance')"
-                                                    fieldRequired="">
-                                        </x-forms.label>
-                                        <p class="f-11 text-grey">@lang('payroll::modules.payroll.extraPay')</p>
-                                    </div>
-                                    <div class="col-md-3">
-
-                                        <x-forms.label fieldId="" :fieldLabel="__('payroll::modules.payroll.fixedAllowance')" />
-
-                                    </div>
-                                    <div class="col-md-3">
-                                        <x-forms.label fieldId="" :fieldLabel="currency_format(0, ($currency->currency ? $currency->currency->id : company()->currency->id ))" />
-                                    </div>
-
-                                    <div class="col-md-3">
-
-                                        <x-forms.label fieldId="" :fieldLabel="currency_format(0, ($currency->currency ? $currency->currency->id : company()->currency->id ))" />
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- </div> --}}
 
                             <div class="col-md-12 salary-total mt-2 rounded bg-light">
                                 <div class="row">

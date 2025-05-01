@@ -251,13 +251,6 @@
 
                 @endforeach
 
-                @if($fixedAllowance > 0)
-                <tr>
-                    <td>@lang('payroll::modules.payroll.fixedAllowance')</td>
-                    <td align="right">{{ currency_format($fixedAllowance, ($payrollSetting->currency ? $payrollSetting->currency->id : company()->currency->id), false)}} {!! htmlentities($payrollSetting->currency ? $payrollSetting->currency->currency_code : company()->currency->currency_code) !!}</td>
-                </tr>
-                @endif
-
                 @forelse ($earningsAdditional as $key=>$item)
                     <tr>
                         <td>{{ $key }}</td>
