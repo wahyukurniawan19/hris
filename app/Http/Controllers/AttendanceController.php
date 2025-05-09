@@ -36,6 +36,9 @@ use App\Models\Company;
 use App\Models\LogTimeFor;
 use App\Models\EmployeeShift;
 use App\Scopes\ActiveScope;
+use App\Models\EmployeeDetails;
+use App\Http\Requests\Attendance\ActionRequestAttendance;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends AccountBaseController
 {
@@ -2330,6 +2333,158 @@ class AttendanceController extends AccountBaseController
         $this->employees = $reportingTo->merge($employee);
 
         return $dataTable->render('attendances.request_attendance', $this->data);
+    }
+
+    public function approveRequestAttendance(Request $request)
+    {
+        $this->reportingTo = EmployeeDetails::where('reporting_to', user()->id)->first();
+
+        abort_403(!($this->reportingTo) && (user()->permission('approve_or_reject_leaves') == 'none'));
+
+        $this->reqAttendanceAction = $request->req_attendance_action;
+        $this->reqAttendanceId = $request->req_attendance_id;
+
+        return view('attendances.approve.index', $this->data);
+    }
+
+    public function requestAttendanceAction(ActionRequestAttendance $request)
+    {
+        $this->reportingTo = EmployeeDetails::where('reporting_to', user()->id)->first();
+
+        abort_403(!($this->reportingTo) && user()->permission('approve_or_reject_leaves') == 'none');
+
+        $requestAttendance = AttendanceRequest::withoutGlobalScopes()->findOrFail($request->reqAttendanceId);
+
+        $this->reqAttendanceStore($requestAttendance, $request);
+
+        if (session()->has('dateRange')) {
+            session()->forget('dateRange');
+        }
+
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
+    public function reqAttendanceStore($requestAttendance, $request)
+    {
+        $requestAttendance->status_approval = $request->action;
+
+        if (isset($request->approveReason)) {
+            $requestAttendance->approve_reason = $request->approveReason;
+        }
+
+        if (isset($request->reason)) {
+            $requestAttendance->reject_reason = $request->reason;
+        }
+
+        $requestAttendance->approved_by = user()->id;
+        $requestAttendance->save();
+
+        if($request->action == 'approved') {
+            Attendance::create([
+                'user_id' => $requestAttendance->user_id,
+                'company_id' => $requestAttendance->company_id,
+                'clock_in_time' => $requestAttendance->clock_in_time,
+                'clock_in_ip' => $requestAttendance->clock_in_ip,
+                'clock_out_time' => $requestAttendance->clock_out_time,
+                'clock_out_ip' => $requestAttendance->clock_out_ip,
+                'working_from' => $requestAttendance->working_from,
+                'location_id' => $requestAttendance->location,
+                'late' => $requestAttendance->late,
+                'employee_shift_id' => $requestAttendance->employee_shift_id,
+                'shift_start_time' => $requestAttendance->shift_start_time,
+                'shift_end_time' => $requestAttendance->shift_end_time,
+                'work_from_type' => $requestAttendance->work_from_type,
+                'notes' => isset($requestAttendance->notes ) ? $requestAttendance->notes : 'null',
+                'half_day' => $requestAttendance->half_day,
+                'half_day_type' => $requestAttendance->half_day_type
+            ]);
+        }
+    }
+
+    public function rejectRequestAttendance(Request $request)
+    {
+        $this->reportingTo = EmployeeDetails::where('reporting_to', user()->id)->first();
+
+        abort_403(!($this->reportingTo) && (user()->permission('approve_or_reject_leaves') == 'none'));
+
+        $this->reqAttendanceAction = $request->req_attendance_action;
+        $this->reqAttendanceId = $request->req_attendance_id;
+
+        return view('attendances.reject.index', $this->data);
+    }
+
+    public function applyQuickAction(Request $request)
+    {
+        switch ($request->action_type) {
+        case 'delete':
+            $this->deleteRecords($request);
+
+            return Reply::success(__('messages.deleteSuccess'));
+        case 'change-req-attendance-status':
+            $result = $this->changeBulkStatus($request);
+
+            if ($result['updated'] > 0 && $result['skipped'] > 0) {
+                $message = __('messages.updateSuccessWithSomeSkipped');
+            } elseif ($result['updated'] > 0) {
+                $message = __('messages.updateSuccess');
+            } else {
+                $message = __('messages.noUpdateMade');
+            }
+
+            return Reply::success($message);
+        default:
+            return Reply::error(__('messages.selectAction'));
+        }
+    }
+
+    protected function changeBulkStatus($request)
+    {
+        abort_403(user()->permission('edit_leave') != 'all');
+
+        $requestAttendance = AttendanceRequest::withoutGlobalScopes()->whereIn('id', explode(',', $request->row_ids))->get();
+
+        $updatedCount = 0;
+        $skippedCount = 0;
+        foreach($requestAttendance as $reqAttendance)
+        {
+            // Check if the leave status is already approved or rejected
+            if (in_array($reqAttendance->status_approval, ['approved', 'rejected'])) {
+                $skippedCount++;
+                continue;
+            }
+
+            $reqAttendance->status_approval = $request->status;
+            $reqAttendance->save();
+
+            if($reqAttendance->status_approval == 'approved') {
+                Attendance::create([
+                    'user_id' => $reqAttendance->user_id,
+                    'company_id' => $reqAttendance->company_id,
+                    'clock_in_time' => $reqAttendance->clock_in_time,
+                    'clock_in_ip' => $reqAttendance->clock_in_ip,
+                    'clock_out_time' => $reqAttendance->clock_out_time,
+                    'clock_out_ip' => $reqAttendance->clock_out_ip,
+                    'working_from' => $reqAttendance->working_from,
+                    'location_id' => $reqAttendance->location,
+                    'late' => $reqAttendance->late,
+                    'employee_shift_id' => $reqAttendance->employee_shift_id,
+                    'shift_start_time' => $reqAttendance->shift_start_time,
+                    'shift_end_time' => $reqAttendance->shift_end_time,
+                    'work_from_type' => $reqAttendance->work_from_type,
+                    'notes' => isset($reqAttendance->notes ) ? $reqAttendance->notes : 'null',
+                    'half_day' => $reqAttendance->half_day,
+                    'half_day_type' => $reqAttendance->half_day_type
+                ]);
+            }
+
+            $updatedCount++;
+        }
+
+        return [
+            'updated' => $updatedCount,
+            'skipped' => $skippedCount
+        ];
+
     }
 
 }

@@ -730,6 +730,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('attendances/import/process', [AttendanceController::class, 'importProcess'])->name('attendances.import.process');
     Route::get('attendances/by-map-location', [AttendanceController::class, 'byMapLocation'])->name('attendances.by_map_location');
     Route::get('attendances/request-attendance', [AttendanceController::class, 'requestAttendance'])->name('attendances.request_attendance');
+    Route::get('attendances/show-approved-modal', [AttendanceController::class, 'approveRequestAttendance'])->name('attendances.show_approved_modal');
+    Route::get('attendances/show-reject-modal', [AttendanceController::class, 'rejectRequestAttendance'])->name('attendances.show_reject_modal');
+    Route::post('attendances/apply-quick-action', [AttendanceController::class, 'applyQuickAction'])->name('attendances.apply_quick_action');
+
+
+    Route::post('attendances/requestAttendanceAction', [AttendanceController::class, 'requestAttendanceAction'])->name('attendances.request_attendance_action');
     Route::resource('attendances', AttendanceController::class);
     Route::get('attendance/{id}/{day}/{month}/{year}', [AttendanceController::class, 'addAttendance'])->name('attendances.add-user-attendance');
     Route::post('attendances/check-half-day', [AttendanceController::class, 'checkHalfDay'])->name('attendances.check_half_day');
