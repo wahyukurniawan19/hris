@@ -155,8 +155,7 @@ class SalaryMonthlyReport implements FromCollection, WithHeadings, WithColumnFor
             $extraEarning = isset($result->extra_json['earnings']) ? array_sum($result->extra_json['earnings']) : 0;
             $extraDeduction = isset($result->extra_json['deductions']) ? array_sum($result->extra_json['deductions']) : 0;
 
-            $fixedAllowance = ($result->fixed_allowance == 0 || $result->fixed_allowance < 0) ? $result->gross_salary - (round($totalEarnings + $extraEarning, 2)) : $result->fixed_allowance;
-            $fixedAllowance = ($fixedAllowance == 0 || $fixedAllowance < 0) ? 0 : $fixedAllowance;
+            $fixedAllowance = 0;
 
             // Setting fix heading columns data
             $row[] = round($result->expense_claims * 1, 2);

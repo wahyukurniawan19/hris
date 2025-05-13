@@ -266,48 +266,6 @@
                                 @endforeach
                             @endif
 
-                            <div class="col-md-12">
-                                <div class="row my-3">
-                                    <div class="col-md-3">
-                                        <x-forms.label fieldId="" :popover="__('payroll::messages.fixedAllowanceMessage')"
-                                                    :fieldLabel="__('payroll::modules.payroll.fixedAllowance')"
-                                                    fieldRequired="">
-                                        </x-forms.label>
-                                        <p class="f-11 text-grey">@lang('payroll::modules.payroll.extraPay')</p>
-                                    </div>
-                                    <div class="col-md-3">
-
-                                        <x-forms.label fieldId="" :fieldLabel="__('payroll::modules.payroll.fixedAllowance')" />
-
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        @if ($fixedAllowance >= 0)
-                                            <input type="hidden" min="0" step=".01" id="fixed_allowance_input"
-                                                name="fixed_allowance_input" value="{{ $fixedAllowance }}">
-                                                <x-forms.label fieldId="" class="monthlyFixedAllowance"
-                                                :fieldLabel="currency_format( $fixedAllowance, ($currency->currency ? $currency->currency->id : company()->currency->id ))" />
-                                        @else
-                                        <x-forms.label fieldId="" class="text-danger monthlyFixedAllowance"
-                                                :fieldLabel="currency_format($fixedAllowance, ($currency->currency ? $currency->currency->id : company()->currency->id ))" />
-                                        @endif
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        @if ($fixedAllowance >= 0)
-                                            <x-forms.label fieldId="" class="yearFixedAllowance"
-                                                    :fieldLabel="currency_format($fixedAllowance * 12, ($currency->currency ? $currency->currency->id : company()->currency->id ))" />
-                                            <input type="hidden" name="fixedAllowance" class="fixedAllowance" value="{{ $fixedAllowance }}"/>
-                                        @else
-                                            <x-forms.label fieldId="" class="text-danger yearFixedAllowance"
-                                                    :fieldLabel="currency_format($fixedAllowance * 12, ($currency->currency ? $currency->currency->id : company()->currency->id ))" />
-                                            <input type="hidden" name="fixedAllowance" value="{{ $fixedAllowance }}"/>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- </div> --}}
-
                             <div class="col-md-12 salary-total mt-2 rounded bg-light">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -718,23 +676,5 @@
             lastValue == undefined)) {
             newFixed = fixed;
         }
-
-        $('.fixedAllowance').val(newFixed);
-
-        var yearlyvariableFix = newFixed * 12;
-
-        $('.monthlyFixedAllowance').html(number_format(newFixed));
-
-        if(newFixed < 0) {
-            $(".monthlyFixedAllowance").addClass("text-danger");
-            $(".yearFixedAllowance").addClass("text-danger");
-        }
-        else{
-            $(".monthlyFixedAllowance").removeClass("text-danger");
-            $(".yearFixedAllowance").removeClass("text-danger");
-        }
-
-
-        $('.yearFixedAllowance').html(number_format(yearlyvariableFix));
     }
 </script>

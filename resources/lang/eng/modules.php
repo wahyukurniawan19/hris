@@ -1843,7 +1843,8 @@ return array(
         'qrcode' => 'QR Code',
         'cybersecurity' => 'Cyber Security',
         'biolinks' => 'Biolinks',
-        'Policy' => 'Policy Center'
+        'Policy' => 'Policy Center',
+        'request attendances' => 'Attendances Request',
     ),
     'projectSettings' => array(
         'sendNotificationsTo' => 'Send Reminder To',

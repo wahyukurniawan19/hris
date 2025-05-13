@@ -171,8 +171,7 @@ class SalaryCumulativeReport implements FromCollection, WithHeadings, WithColumn
                 }
             }
 
-            $fixedAllowance = ($result->fixed_allowance == 0 || $result->fixed_allowance < 0) ? $result->gross_salary - (round($totalEarnings + $extraEarning, 2)) : $result->fixed_allowance;
-            $fixedAllowance = ($fixedAllowance == 0 || $fixedAllowance < 0) ? 0 : $fixedAllowance;
+            $fixedAllowance = 0;
 
             $row[$result->emp_employee_id]['expense_claim'] = isset($row[$result->emp_employee_id]['expense_claim']) ? round($row[$result->emp_employee_id]['expense_claim'] + $result->expense_claim * 1, 2) : $result->expense_claim * 1;
             $row[$result->emp_employee_id]['extra_earning'] = isset($row[$result->emp_employee_id]['extra_earning']) ? round($row[$result->emp_employee_id]['extra_earning'] + $extraEarning, 2) : $extraEarning;

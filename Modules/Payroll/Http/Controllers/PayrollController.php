@@ -149,11 +149,7 @@ class PayrollController extends AccountBaseController
 
         $earn = array_sum($earn);
 
-        $this->fixedAllowance = $this->salarySlip->gross_salary - ($this->basicSalary + $earn);
-
-        if ($this->fixedAllowance < 0){
-            $this->fixedAllowance = 0;
-        }
+        $this->fixedAllowance = 0;
 
         if (!is_null($extraJson)) {
 
@@ -203,9 +199,7 @@ class PayrollController extends AccountBaseController
             })->all();
         }
 
-        if($this->fixedAllowance < 1 && $this->fixedAllowance > -1 ){
-            $this->fixedAllowance = 0;
-        }
+        $this->fixedAllowance = 0;
 
         if (request()->ajax()) {
             $html = view('payroll::payroll.ajax.show-modal', $this->data)->render();
@@ -304,12 +298,7 @@ class PayrollController extends AccountBaseController
             $extraEarn = array_sum($extraEarn);
 
 
-            $this->fixedAllowance = $this->salarySlip->gross_salary - ($this->basicSalary + $earn + $extraEarn);
-
-        if($this->fixedAllowance < 0 )
-            {
             $this->fixedAllowance = 0;
-        }
 
             $this->currency = PayrollSetting::with('currency')->first();
             $this->salaryPaymentMethods = SalaryPaymentMethod::all();
@@ -1055,9 +1044,7 @@ class PayrollController extends AccountBaseController
             $this->basicSalary = 0.0;
         }
 
-        $this->fixedAllowance = $this->salarySlip->gross_salary - ($this->basicSalary + $earn + $extraEarn);
-
-        $this->fixedAllowance = ($this->fixedAllowance < 0) ? 0 : round(floatval($this->fixedAllowance), 2);
+        $this->fixedAllowance = 0;
 
         $this->payrollSetting = PayrollSetting::first();
 

@@ -153,22 +153,6 @@
                                     </tr>
                                 @endif
                                 @endforeach
-                                <tr id="fixedAllowanceTr">
-                                    <td class="pr-2">@lang('payroll::modules.payroll.fixedAllowance')</td>
-                                    <td class="text-right">
-                                        @php
-                                            $fixedAllow = ($salarySlip->fixed_allowance > 0) ? $salarySlip->fixed_allowance : $fixedAllowance;
-                                        @endphp
-                                        <input type="hidden" min="0" step=".01" id="fixed_allowance_input"
-                                               name="fixed_allowance_input" value="{{ $fixedAllow }}">
-                                        <input type="number" min="0" step=".01" disabled
-                                               class="form-control text-right height-35 f-14 my-2 fixedAllowance"
-                                               name="fixed" id="fixed" value="{{ $fixedAllow }}">
-                                    </td>
-                                    <td>
-
-                                    </td>
-                                </tr>
 
                                 </tbody>
                             </table>
@@ -506,7 +490,7 @@
 
             $('#net-salary').html(formatedSalary);
             $('#fixed').val(netFixed);
-            $('#fixed_allowance_input').val(fixed);
+            $('#fixed_allowance_input').val(0);
             $('#grossSalary').val(grossSalary);
         }
 
