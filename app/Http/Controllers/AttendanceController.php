@@ -2487,4 +2487,23 @@ class AttendanceController extends AccountBaseController
 
     }
 
+    /**
+     * Show the attendance request detail modal.
+     */
+    public function showAttendanceRequestDetail($id)
+    {
+        $attendanceRequest = \App\Models\AttendanceRequest::with('user')->findOrFail($id);
+
+        // Prepare fields for the modal
+        $attendanceRequest->employee_id = $attendanceRequest->user ? $attendanceRequest->user->employeeDetail->employee_id ?? '' : '';
+        $attendanceRequest->pic_name = $attendanceRequest->user ? $attendanceRequest->user->name : '';
+        $attendanceRequest->decision_by_name = '';
+        if ($attendanceRequest->status_approval === 'approved' || $attendanceRequest->status_approval === 'rejected') {
+            $decisionBy = \App\Models\User::find($attendanceRequest->approved_by);
+            $attendanceRequest->decision_by_name = $decisionBy ? $decisionBy->name : '';
+        }
+
+        return view('attendances.ajax.request_detail', compact('attendanceRequest'));
+    }
+
 }

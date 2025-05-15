@@ -92,7 +92,7 @@ class RequestAttendanceDataTable extends BaseDataTable
                          </a>
                          <div class="dropdown-menu dropdown-menu-right">';
      
-                 $actions .= '<a href="' . route('attendances.show', $row->id) . '" class="dropdown-item"><i class="fa fa-eye mr-2"></i>' . __('app.view') . '</a>';
+                 $actions .= '<a href="javascript:void(0);" class="dropdown-item attendance-request-detail" data-id="' . $row->id . '"><i class="fa fa-eye mr-2"></i>' . __('app.view') . '</a>';
      
                  if ($row->status_approval == 'pending' && $this->approveRejectPermission == 'all') {
                      $actions .= '<a class="dropdown-item attendance-action-approved" data-req-attendance-id="' . $row->id . '" data-req-attendance-action="approved" href="javascript:;"><i class="fa fa-check mr-2"></i>' . __('app.approve') . '</a>';

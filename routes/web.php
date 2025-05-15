@@ -736,6 +736,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
 
 
     Route::post('attendances/requestAttendanceAction', [AttendanceController::class, 'requestAttendanceAction'])->name('attendances.request_attendance_action');
+    Route::get('attendances/request-detail/{id}', [AttendanceController::class, 'showAttendanceRequestDetail'])->name('attendances.request_detail');
     Route::resource('attendances', AttendanceController::class);
     Route::get('attendance/{id}/{day}/{month}/{year}', [AttendanceController::class, 'addAttendance'])->name('attendances.add-user-attendance');
     Route::post('attendances/check-half-day', [AttendanceController::class, 'checkHalfDay'])->name('attendances.check_half_day');
@@ -866,4 +867,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('gantt_link.task_update', [GanttLinkController::class, 'taskUpdateController'])->name('gantt_link.task_update');
     Route::resource('gantt_link', GanttLinkController::class);
 
+
 });
+
+// Route ini di luar group 'account'
+Route::get('attendances/request-detail/{id}', [AttendanceController::class, 'showAttendanceRequestDetail'])->name('attendances.request_detail');

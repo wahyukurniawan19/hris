@@ -290,5 +290,13 @@
             $.ajaxModal(MODAL_LG, url);
         });
 
+        $('body').on('click', '.attendance-request-detail', function() {
+            var id = $(this).data('id');
+            var url = "{{ route('attendances.request_detail', ':id') }}".replace(':id', id);
+
+            $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
+            $.ajaxModal(MODAL_LG, url);
+        });
+
     </script>
 @endpush
