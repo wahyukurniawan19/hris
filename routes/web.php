@@ -869,6 +869,3 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
 
 
 });
-
-// Route ini di luar group 'account'
-Route::get('attendances/request-detail/{id}', [AttendanceController::class, 'showAttendanceRequestDetail'])->name('attendances.request_detail');

@@ -27,6 +27,7 @@ use IvanoMatteo\LaravelDeviceTracking\Traits\UseDevices;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticationProvider;
 use Trebol\Entrust\Traits\EntrustUserTrait;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * App\Models\User
@@ -220,7 +221,7 @@ use Trebol\Entrust\Traits\EntrustUserTrait;
 class User extends BaseModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
 
-    use Notifiable, EntrustUserTrait, Authenticatable, Authorizable, CanResetPassword, HasFactory, TwoFactorAuthenticatable;
+    use Notifiable, EntrustUserTrait, Authenticatable, Authorizable, CanResetPassword, HasFactory, TwoFactorAuthenticatable, HasApiTokens;
     use HasCompany;
     use HasMaskImage;
     use UseDevices;

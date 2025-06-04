@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d031baae89a2e641f6ce82f5c44a21a2",
+    "content-hash": "2c96dd441f9a9b82dbf755d5b54ccee3",
     "packages": [
         {
             "name": "apimatic/jsonmapper",
@@ -5830,13 +5830,13 @@
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                },
                 "laravel": {
                     "providers": [
                         "Laravel\\Sanctum\\SanctumServiceProvider"
                     ]
+                },
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
                 }
             },
             "autoload": {
@@ -21050,14 +21050,14 @@
     ],
     "minimum-stability": "dev",
     "stability-flags": {
-        "paypal/rest-api-sdk-php": 20,
-        "ivanomatteo/laravel-device-tracking": 20
+        "ivanomatteo/laravel-device-tracking": 20,
+        "paypal/rest-api-sdk-php": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

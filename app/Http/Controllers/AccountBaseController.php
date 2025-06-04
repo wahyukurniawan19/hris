@@ -44,11 +44,13 @@ class AccountBaseController extends Controller
     public function adminSpecific()
     {
 
-        abort_403(!user()->admin_approval && request()->ajax());
-
-        if (!user()->admin_approval && Route::currentRouteName() != 'account_unverified') {
-            // send() is added to force redirect from here rather return to called function
-            return redirect(route('account_unverified'))->send();
+        if (!user() || !user()->admin_approval) {
+            if (request()->ajax()) {
+                abort_403(true);
+            }
+            if (Route::currentRouteName() != 'account_unverified') {
+                return redirect(route('account_unverified'))->send();
+            }
         }
 
         $this->adminTheme = admin_theme();
@@ -87,23 +89,30 @@ class AccountBaseController extends Controller
         $this->smtpSetting = smtp_setting();
         $this->pusherSettings = pusher_settings();
 
-        App::setLocale(user()->locale);
-        Carbon::setLocale(user()->locale);
-        setlocale(LC_TIME, user()->locale . '_' . mb_strtoupper($this->company->locale));
-
         $this->user = user();
-        $this->unreadNotificationCount = count($this->user?->unreadNotifications);
-        $this->stickyNotes = $this->user->sticky;
+
+        $locale = optional($this->user)->locale ?? config('app.locale');
+        App::setLocale($locale);
+        Carbon::setLocale($locale);
+        if ($this->company && isset($this->company->locale)) {
+            setlocale(LC_TIME, $locale . '_' . mb_strtoupper($this->company->locale));
+        }
+
+        $this->unreadNotificationCount = $this->user && $this->user->unreadNotifications
+            ? count($this->user->unreadNotifications)
+            : 0;
+        $this->stickyNotes = optional($this->user)->sticky;
 
         $this->worksuitePlugins = worksuite_plugins();
 
         $this->checkListTotal = GlobalSetting::CHECKLIST_TOTAL;
 
-        if (in_array('admin', user_roles())) {
+        $roles = user_roles() ?? [];
+        if (in_array('admin', $roles)) {
             $this->appTheme = admin_theme();
             $this->checkListCompleted = GlobalSetting::checkListCompleted();
         }
-        else if (in_array('client', user_roles())) {
+        else if (in_array('client', $roles)) {
             $this->appTheme = client_theme();
         }
         else {

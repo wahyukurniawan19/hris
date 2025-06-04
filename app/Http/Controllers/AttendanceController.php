@@ -40,6 +40,7 @@ use App\Models\EmployeeDetails;
 use App\Http\Requests\Attendance\ActionRequestAttendance;
 use Illuminate\Support\Facades\Log;
 
+
 class AttendanceController extends AccountBaseController
 {
 
@@ -52,11 +53,12 @@ class AttendanceController extends AccountBaseController
         parent::__construct();
         $this->pageTitle = 'app.menu.attendance';
         $this->middleware(function ($request, $next) {
-            abort_403(!in_array('attendance', $this->user->modules));
+            if (!$this->user || !is_array($this->user->modules) || !in_array('attendance', $this->user->modules)) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
             $this->viewAttendancePermission = user()->permission('view_attendance');
-
             return $next($request);
-        });
+        })->except(['getClockTimes', 'getClockTimesBatch']);
     }
 
     public function index(Request $request)
@@ -923,12 +925,17 @@ class AttendanceController extends AccountBaseController
 
     public function employeeData(Request $request, $startDate = null, $endDate = null, $userId = null)
     {
-        // todo ::~
-        $ant = []; // Array For attendance Data indexed by similar date
-        $dateWiseData = []; // Array For Combine Data
+        $ant = [];
+        $dateWiseData = [];
 
-        $startDate = Carbon::createFromFormat('d-m-Y', '21-' . $request->month . '-' . $request->year)->startOfDay();
-        $endDate = $startDate->copy()->addMonth()->day(20)->endOfDay();
+        // Ambil dari request jika ada
+        if ($request->has('startDate') && $request->has('endDate')) {
+            $startDate = Carbon::createFromFormat('d-m-Y', $request->startDate)->startOfDay();
+            $endDate = Carbon::createFromFormat('d-m-Y', $request->endDate)->endOfDay();
+        } else {
+            $startDate = Carbon::createFromFormat('d-m-Y', '21-' . $request->month . '-' . $request->year)->startOfDay();
+            $endDate = $startDate->copy()->addMonth()->day(20)->endOfDay();
+        }
         $userId = $request->userId;
 
         $attendances = Attendance::userAttendanceByDate($startDate, $endDate, $userId); // Getting Attendance Data
@@ -1014,6 +1021,50 @@ class AttendanceController extends AccountBaseController
                 // Set Leave Data
                 if (array_key_exists($date->toDateString(), $leavesDates)) {
                     $dateWiseData[$date->toDateString()]['leave'] = $leavesDates[$date->toDateString()];
+                }
+
+                // Tambahkan logging debug untuk pengecekan shift Day Off
+                $shiftSchedule = \App\Models\EmployeeShiftSchedule::with('shift')
+                    ->where('user_id', $userId)
+                    ->where('date', $date->toDateString())
+                    ->first();
+                \Log::info('Cek Day Off', [
+                    'user_id' => $userId,
+                    'date' => $date->toDateString(),
+                    'shiftSchedule' => $shiftSchedule,
+                    'shiftName' => $shiftSchedule && $shiftSchedule->shift ? $shiftSchedule->shift->shift_name : null
+                ]);
+                if ($shiftSchedule) {
+                    if (!$shiftSchedule->shift) {
+                        // Force load relasi shift jika null
+                        $shiftSchedule->load('shift');
+                        \Log::info('Force load relasi shift', [
+                            'user_id' => $userId,
+                            'date' => $date->toDateString(),
+                            'employee_shift_id' => $shiftSchedule->employee_shift_id,
+                            'shift_after_load' => $shiftSchedule->shift
+                        ]);
+                    }
+                    if ($shiftSchedule->shift && $shiftSchedule->shift->shift_name == 'Day Off') {
+                        $dateWiseData[$date->toDateString()]['holiday'] = [
+                            'occassion' => 'Day Off'
+                        ];
+                    }
+                } else if (!$shiftSchedule) {
+                    // Fallback: cek default shift user
+                    $defaultShift = \App\Models\EmployeeShift::where('shift_name', 'Day Off')->first();
+                    if ($defaultShift) {
+                        \Log::info('Fallback Day Off', [
+                            'user_id' => $userId,
+                            'date' => $date->toDateString(),
+                            'default_shift_id' => $defaultShift->id
+                        ]);
+                        // Cek apakah user memang tidak dijadwalkan kerja di hari itu (misal: sabtu/minggu atau policy perusahaan)
+                        // Jika ingin lebih spesifik, tambahkan pengecekan hari di sini
+                        $dateWiseData[$date->toDateString()]['holiday'] = [
+                            'occassion' => 'Day Off'
+                        ];
+                    }
                 }
 
             }
@@ -2504,6 +2555,234 @@ class AttendanceController extends AccountBaseController
         }
 
         return view('attendances.ajax.request_detail', compact('attendanceRequest'));
+    }
+
+    public function clockIn(Request $request)
+    {
+        \Log::info('User:', ['user' => user()]);
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'note' => 'nullable|string',
+            'photo' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+
+        $photoPath = null;
+        if ($request->photo) {
+            $photoData = base64_decode($request->photo);
+            $fileName = 'attendance_' . $request->user_id . '_' . date('Ymd_His') . '.jpg';
+            $filePath = 'uploads/attendance/' . $fileName;
+            \Storage::disk('public')->put($filePath, $photoData);
+            $photoPath = $filePath;
+        }
+
+        // Cek apakah sudah ada clock in hari ini yang belum clock out
+        $attendance = \App\Models\Attendance::where('user_id', $request->user_id)
+            ->whereDate('clock_in_time', now()->toDateString())
+            ->whereNull('clock_out_time')
+            ->first();
+
+        if ($attendance) {
+            // Update data clock in
+            $attendance->notes = $request->note;
+            $attendance->latitude = $request->latitude;
+            $attendance->longitude = $request->longitude;
+            if ($photoPath) $attendance->photo_path = $photoPath;
+            $attendance->save();
+        } else {
+            // Buat record baru
+            $attendance = new \App\Models\Attendance();
+            $attendance->user_id = $request->user_id;
+            $attendance->clock_in_time = now();
+            $attendance->notes = $request->note;
+            $attendance->latitude = $request->latitude;
+            $attendance->longitude = $request->longitude;
+            if ($photoPath) $attendance->photo_path = $photoPath;
+            $attendance->save();
+        }
+
+        return response()->json(['message' => 'Clock In berhasil', 'attendance' => $attendance]);
+    }
+
+    public function clockOut(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'note' => 'nullable|string',
+            'photo' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+
+        $photoPath = null;
+        if ($request->photo) {
+            $photoData = base64_decode($request->photo);
+            $fileName = 'attendance_' . $request->user_id . '_' . date('Ymd_His') . '.jpg';
+            $filePath = 'uploads/attendance/' . $fileName;
+            \Storage::disk('public')->put($filePath, $photoData);
+            $photoPath = $filePath;
+        }
+
+        // Cari record clock in yang belum clock out
+        $attendance = \App\Models\Attendance::where('user_id', $request->user_id)
+            ->whereNull('clock_out_time')
+            ->latest('clock_in_time')
+            ->first();
+
+        if (!$attendance) {
+            return response()->json(['message' => 'Tidak ada data clock in yang aktif'], 404);
+        }
+
+        $attendance->clock_out_time = now();
+        $attendance->notes = $request->note;
+        $attendance->latitude = $request->latitude;
+        $attendance->longitude = $request->longitude;
+        if ($photoPath) $attendance->photo_path = $photoPath;
+        $attendance->save();
+
+        return response()->json(['message' => 'Clock Out berhasil', 'attendance' => $attendance]);
+    }
+
+    // Endpoint untuk preview detail absensi (catatan & gambar)
+    public function showAttendanceDetail($id)
+    {
+        $attendance = \App\Models\Attendance::findOrFail($id);
+        return response()->json([
+            'attendance' => $attendance,
+            'photo_url' => $attendance->photo_path ? \Storage::disk('public')->url($attendance->photo_path) : null,
+            'note' => $attendance->notes,
+        ]);
+    }
+
+    public function getClockTimes($user_id, $date)
+    {
+        \Log::info('API getClockTimes called', ['user_id' => $user_id, 'date' => $date]);
+
+        $attendance = \App\Models\Attendance::where('user_id', $user_id)
+            ->whereDate('clock_in_time', $date)
+            ->first();
+
+        $clockIn = $attendance && $attendance->clock_in_time ? $attendance->clock_in_time->format('H:i') : '-';
+        $clockOut = $attendance && $attendance->clock_out_time ? $attendance->clock_out_time->format('H:i') : '-';
+
+        return response()->json([
+            'clock_in' => $clockIn,
+            'clock_out' => $clockOut,
+        ]);
+    }
+
+    public function getClockTimesBatch($user_id, $start_date, $end_date)
+    {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        // Hanya boleh akses data sendiri atau admin
+        if ($authUser->id != $user_id && !$authUser->hasRole('admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+        $attendances = \App\Models\Attendance::where('user_id', $user_id)
+            ->whereBetween('clock_in_time', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
+            ->get(['clock_in_time', 'clock_out_time']);
+
+        $result = [];
+        foreach ($attendances as $att) {
+            $date = $att->clock_in_time->format('Y-m-d');
+            $result[$date] = [
+                'clock_in' => $att->clock_in_time ? $att->clock_in_time->format('H:i') : '-',
+                'clock_out' => $att->clock_out_time ? $att->clock_out_time->format('H:i') : '-',
+            ];
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * API: Get attendance summary as JSON (for mobile & web)
+     */
+    public function getAttendanceSummaryJson($user_id, $start_date, $end_date)
+    {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        if ($authUser->id != $user_id && !$authUser->hasRole('admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+        $start = \Carbon\Carbon::parse($start_date)->startOfDay();
+        $end = \Carbon\Carbon::parse($end_date)->endOfDay();
+        $attendances = \App\Models\Attendance::userAttendanceByDate($start, $end, $user_id);
+        $holidays = \App\Models\Holiday::getHolidayByDates($start, $end, $user_id);
+        $leaves = \App\Models\Leave::where('user_id', $user_id)
+            ->where('leave_date', '>=', $start)
+            ->where('leave_date', '<=', $end)
+            ->where('status', 'approved')
+            ->select('leave_date', 'reason', 'duration')
+            ->get()->keyBy('leave_date')->toArray();
+        $holidayData = $holidays->keyBy('holiday_date');
+        $holidayArray = $holidayData->toArray();
+        $result = [];
+        $date = $start->copy();
+        while (!$date->gt($end)) {
+            $dateStr = $date->toDateString();
+            // Ambil semua attendance di tanggal ini
+            $attForDate = $attendances->filter(function($a) use ($dateStr) {
+                return $a->clock_in_time->format('Y-m-d') === $dateStr;
+            });
+            $attendanceArr = [];
+            $clockInEarliest = null;
+            $clockOutLatest = null;
+            $statusSummary = null;
+            foreach ($attForDate as $att) {
+                $attendanceArr[] = [
+                    'clock_in' => $att->clock_in_time ? $att->clock_in_time->format('H:i') : '-',
+                    'clock_out' => $att->clock_out_time ? $att->clock_out_time->format('H:i') : '-',
+                    'half_day' => $att->half_day == 'yes',
+                    'late' => $att->late == 'yes',
+                    'notes' => $att->notes,
+                ];
+                // Untuk ringkasan per hari
+                if ($att->clock_in_time && (!$clockInEarliest || $att->clock_in_time < $clockInEarliest)) {
+                    $clockInEarliest = $att->clock_in_time;
+                }
+                if ($att->clock_out_time && (!$clockOutLatest || $att->clock_out_time > $clockOutLatest)) {
+                    $clockOutLatest = $att->clock_out_time;
+                }
+                if ($att->half_day == 'yes') {
+                    $statusSummary = 'Half Day';
+                } else if ($att->late == 'yes') {
+                    $statusSummary = 'Late';
+                } else if ($att->clock_in_time) {
+                    $statusSummary = 'Present';
+                }
+            }
+            $result[$dateStr] = [
+                'attendances' => $attendanceArr,
+                'clock_in_earliest' => $clockInEarliest ? $clockInEarliest->format('H:i') : '-',
+                'clock_out_latest' => $clockOutLatest ? $clockOutLatest->format('H:i') : '-',
+                'status' => $statusSummary,
+                'holiday' => array_key_exists($dateStr, $holidayArray) ? $holidayData[$dateStr] : false,
+                'leave' => array_key_exists($dateStr, $leaves) ? $leaves[$dateStr] : false,
+                'shift' => '08:00 - 17:00', // dummy shift
+            ];
+            $date->addDay();
+        }
+        $totalWorkingDays = $start->daysInMonth - count($holidays);
+        $daysPresent = \App\Models\Attendance::countDaysPresentByUser($start, $end, $user_id);
+        $daysLate = \App\Models\Attendance::countDaysLateByUser($start, $end, $user_id);
+        $halfDays = \App\Models\Attendance::countHalfDaysByUser($start, $end, $user_id);
+        $daysAbsent = (($totalWorkingDays - $daysPresent) < 0) ? 0 : ($totalWorkingDays - $daysPresent);
+        $holidayCount = count($holidays);
+        return response()->json([
+            'data' => $result,
+            'daysPresent' => $daysPresent,
+            'daysLate' => $daysLate,
+            'halfDays' => $halfDays,
+            'totalWorkingDays' => $totalWorkingDays,
+            'absentDays' => $daysAbsent,
+            'holidays' => $holidayCount,
+        ]);
     }
 
 }
