@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../repositories/attendance_repository.dart';
 
-// Event
+/// Event untuk ClockOutBloc
 abstract class ClockOutEvent extends Equatable {
   const ClockOutEvent();
   @override
@@ -14,12 +14,16 @@ abstract class ClockOutEvent extends Equatable {
 class ClockOutStarted extends ClockOutEvent {}
 class ClockOutLocationRequested extends ClockOutEvent {}
 class ClockOutImagePicked extends ClockOutEvent {}
+
+/// Event ketika catatan berubah
 class ClockOutNoteChanged extends ClockOutEvent {
   final String note;
   const ClockOutNoteChanged(this.note);
   @override
   List<Object?> get props => [note];
 }
+
+/// Event ketika user submit clock out
 class ClockOutSubmitted extends ClockOutEvent {
   final int userId;
   final String token;
@@ -29,7 +33,7 @@ class ClockOutSubmitted extends ClockOutEvent {
   List<Object?> get props => [userId, token, note];
 }
 
-// State
+/// State untuk ClockOutBloc
 class ClockOutState extends Equatable {
   final bool isLoading;
   final String? errorMessage;
@@ -45,6 +49,7 @@ class ClockOutState extends Equatable {
     this.imageFile,
     this.note,
   });
+
   ClockOutState copyWith({
     bool? isLoading,
     String? errorMessage,
@@ -62,11 +67,12 @@ class ClockOutState extends Equatable {
       note: note ?? this.note,
     );
   }
+
   @override
   List<Object?> get props => [isLoading, errorMessage, successMessage, position, imageFile, note];
 }
 
-// Bloc
+/// Bloc untuk mengelola proses clock out
 class ClockOutBloc extends Bloc<ClockOutEvent, ClockOutState> {
   final AttendanceRepository repository;
   ClockOutBloc({required this.repository}) : super(const ClockOutState()) {

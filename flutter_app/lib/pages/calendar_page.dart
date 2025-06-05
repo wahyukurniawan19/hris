@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../bloc/calendar/calendar_bloc.dart';
+import '../themes/theme.dart';
 
 class CalendarPage extends StatelessWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -23,9 +24,9 @@ class _CalendarView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kalender'),
-        backgroundColor: const Color(0xFF1A237E),
+        backgroundColor: primaryBlue,
       ),
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: backgroundGray,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Card(
@@ -47,11 +48,11 @@ class _CalendarView extends StatelessWidget {
                   },
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
-                      color: const Color(0xFF1A237E).withOpacity(0.7),
+                      color: primaryBlue.withOpacity(0.7),
                       shape: BoxShape.circle,
                     ),
                     selectedDecoration: const BoxDecoration(
-                      color: Color(0xFF1A237E),
+                      color: primaryBlue,
                       shape: BoxShape.circle,
                     ),
                     weekendTextStyle: const TextStyle(color: Colors.redAccent),

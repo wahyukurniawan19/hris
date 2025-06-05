@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../widgets/custom_button.dart';
+import '../themes/theme.dart';
+import '../utils/date_formatter.dart';
 import 'attendance_clockin_page.dart';
 import 'attendance_clockout_page.dart';
 import 'calendar_page.dart';
@@ -39,11 +42,11 @@ class DashboardPage extends StatelessWidget {
     }
     final name = userData['name'] ?? '-';
     final now = DateTime.now();
-    final dateStr = "${now.day} ${_bulanIndo(now.month)} ${now.year}";
+    final dateStr = formatDate(now);
     final profilePic = userData['profile_pic'] ?? null;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: backgroundGray,
       bottomNavigationBar: _BottomNavBar(selectedIndex: 0),
       body: SafeArea(
         child: Column(
@@ -71,7 +74,7 @@ class DashboardPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 32,
-                    backgroundColor: const Color(0xFF1A237E),
+                    backgroundColor: primaryBlue,
                     backgroundImage: profilePic != null ? NetworkImage(profilePic) : null,
                     child: profilePic == null ? Icon(Icons.person, color: Colors.white, size: 36) : null,
                   ),
@@ -121,32 +124,30 @@ class DashboardPage extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: _AnimatedButton(
-                      icon: Icons.login,
+                    child: CustomButton(
                       label: 'Clock In',
-                      onTap: () {
+                      color: primaryBlue,
+                      onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => AttendanceClockInPage(userData: userData, token: token),
                           ),
                         );
                       },
-                      color: const Color(0xFF1A237E),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _AnimatedButton(
-                      icon: Icons.logout,
+                    child: CustomButton(
                       label: 'Clock Out',
-                      onTap: () {
+                      color: primaryBlue,
+                      onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => AttendanceClockOutPage(userData: userData, token: token),
                           ),
                         );
                       },
-                      color: const Color(0xFF1A237E),
                     ),
                   ),
                 ],
@@ -280,7 +281,7 @@ class _DashboardMenuItem extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 38, color: iconColor ?? Color(0xFF1A237E)),
+              Icon(icon, size: 38, color: iconColor ?? primaryBlue),
               const SizedBox(height: 12),
               Text(
                 label,
@@ -304,7 +305,7 @@ class _BottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: selectedIndex,
       backgroundColor: Colors.white,
-      selectedItemColor: const Color(0xFF1A237E),
+      selectedItemColor: primaryBlue,
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,
       type: BottomNavigationBarType.fixed,
@@ -327,7 +328,7 @@ class _NotificationBanner extends StatelessWidget {
     // Example: show a static notification, replace with dynamic logic as needed
     return Container(
       width: double.infinity,
-      color: const Color(0xFF1A237E),
+      color: primaryBlue,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Row(
         children: const [
@@ -340,72 +341,6 @@ class _NotificationBanner extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AnimatedButton extends StatefulWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color color;
-  const _AnimatedButton({required this.icon, required this.label, required this.onTap, required this.color});
-
-  @override
-  State<_AnimatedButton> createState() => _AnimatedButtonState();
-}
-
-class _AnimatedButtonState extends State<_AnimatedButton> with SingleTickerProviderStateMixin {
-  double _scale = 1.0;
-
-  void _onTapDown(TapDownDetails details) {
-    setState(() => _scale = 0.96);
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    setState(() => _scale = 1.0);
-  }
-
-  void _onTapCancel() {
-    setState(() => _scale = 1.0);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 120),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: widget.color,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: widget.color.withOpacity(0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(widget.icon, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(
-                widget.label,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

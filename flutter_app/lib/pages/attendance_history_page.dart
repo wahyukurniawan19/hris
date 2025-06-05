@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../bloc/attendance_history/attendance_history_bloc.dart';
 import '../repositories/attendance_repository.dart';
+import '../widgets/custom_button.dart';
+import '../themes/theme.dart';
+import '../utils/date_formatter.dart';
 
 class AttendanceHistoryPage extends StatelessWidget {
   final Map<String, dynamic> userData;
@@ -44,7 +47,7 @@ class _AttendanceHistoryView extends StatelessWidget {
             child: Scaffold(
               appBar: AppBar(
                 title: const Text('Daftar Absensi'),
-                backgroundColor: const Color(0xFF1A237E),
+                backgroundColor: primaryBlue,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () => Navigator.of(context).pop(),
@@ -104,15 +107,10 @@ class _RiwayatTab extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: const BorderSide(color: Color(0xFF1A237E)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
+                child: CustomButton(
+                  label: monthStr,
+                  color: primaryBlue,
                   onPressed: () => _showMonthPicker(context),
-                  icon: const Icon(Icons.calendar_today, color: Color(0xFF1A237E)),
-                  label: Text(monthStr, style: const TextStyle(color: Color(0xFF1A237E))),
                 ),
               ),
             ],
@@ -188,7 +186,7 @@ class _RiwayatTab extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              DateFormat('d MMM', 'id_ID').format(date),
+                              formatDate(date),
                               style: TextStyle(
                                 color: fontColor,
                                 fontWeight: FontWeight.bold,
@@ -323,9 +321,9 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                       height: 40,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? Color(0xFF1A237E) : Colors.transparent,
+                        color: isSelected ? primaryBlue : Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: isSelected ? Color(0xFF1A237E) : Colors.grey.shade300),
+                        border: Border.all(color: isSelected ? primaryBlue : Colors.grey.shade300),
                       ),
                       child: Text(
                         DateFormat('MMM', 'id_ID').format(DateTime(0, m)),

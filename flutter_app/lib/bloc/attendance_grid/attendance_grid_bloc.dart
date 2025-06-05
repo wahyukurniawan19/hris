@@ -2,13 +2,14 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../repositories/attendance_repository.dart';
 
-// Event
+/// Event untuk AttendanceGridBloc
 abstract class AttendanceGridEvent extends Equatable {
   const AttendanceGridEvent();
   @override
   List<Object?> get props => [];
 }
 
+/// Event untuk mengambil data absensi hari ini
 class AttendanceGridFetchToday extends AttendanceGridEvent {
   final int userId;
   final String token;
@@ -17,7 +18,7 @@ class AttendanceGridFetchToday extends AttendanceGridEvent {
   List<Object?> get props => [userId, token];
 }
 
-// State
+/// State untuk AttendanceGridBloc
 abstract class AttendanceGridState extends Equatable {
   const AttendanceGridState();
   @override
@@ -26,12 +27,16 @@ abstract class AttendanceGridState extends Equatable {
 
 class AttendanceGridInitial extends AttendanceGridState {}
 class AttendanceGridLoading extends AttendanceGridState {}
+
+/// State ketika data absensi hari ini berhasil di-load
 class AttendanceGridLoaded extends AttendanceGridState {
   final Map<String, dynamic> todayData;
   const AttendanceGridLoaded(this.todayData);
   @override
   List<Object?> get props => [todayData];
 }
+
+/// State ketika terjadi error
 class AttendanceGridError extends AttendanceGridState {
   final String error;
   const AttendanceGridError(this.error);
@@ -39,14 +44,17 @@ class AttendanceGridError extends AttendanceGridState {
   List<Object?> get props => [error];
 }
 
-// Bloc
+/// Bloc untuk mengelola state grid absensi
 class AttendanceGridBloc extends Bloc<AttendanceGridEvent, AttendanceGridState> {
   final AttendanceRepository repository;
   AttendanceGridBloc({required this.repository}) : super(AttendanceGridInitial()) {
     on<AttendanceGridFetchToday>(_onFetchToday);
   }
 
-  Future<void> _onFetchToday(AttendanceGridFetchToday event, Emitter<AttendanceGridState> emit) async {
+  Future<void> _onFetchToday(
+    AttendanceGridFetchToday event,
+    Emitter<AttendanceGridState> emit,
+  ) async {
     emit(AttendanceGridLoading());
     try {
       final todayData = await repository.fetchTodayAttendance(userId: event.userId, token: event.token);

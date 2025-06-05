@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../themes/theme.dart';
+import '../widgets/custom_button.dart';
 import 'dashboard_page.dart';
 import 'attendance_history_page.dart';
 
@@ -59,12 +61,9 @@ class SuccessAttendancePage extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1565C0),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
+                    child: CustomButton(
+                      label: 'kembali ke beranda',
+                      color: primaryBlue,
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
@@ -73,7 +72,6 @@ class SuccessAttendancePage extends StatelessWidget {
                           (route) => false,
                         );
                       },
-                      child: const Text('kembali ke beranda', style: TextStyle(fontSize: 16, color: Colors.white)),
                     ),
                   ),
                   const SizedBox(height: 12),

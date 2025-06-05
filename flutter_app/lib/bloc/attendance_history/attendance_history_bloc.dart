@@ -3,13 +3,14 @@ import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 import '../../repositories/attendance_repository.dart';
 
-// Event
+/// Event untuk AttendanceHistoryBloc
 abstract class AttendanceHistoryEvent extends Equatable {
   const AttendanceHistoryEvent();
   @override
   List<Object?> get props => [];
 }
 
+/// Event untuk mengambil data riwayat absensi bulan tertentu
 class AttendanceHistoryFetch extends AttendanceHistoryEvent {
   final int userId;
   final String token;
@@ -19,7 +20,7 @@ class AttendanceHistoryFetch extends AttendanceHistoryEvent {
   List<Object?> get props => [userId, token, month];
 }
 
-// State
+/// State untuk AttendanceHistoryBloc
 abstract class AttendanceHistoryState extends Equatable {
   const AttendanceHistoryState();
   @override
@@ -28,6 +29,8 @@ abstract class AttendanceHistoryState extends Equatable {
 
 class AttendanceHistoryInitial extends AttendanceHistoryState {}
 class AttendanceHistoryLoading extends AttendanceHistoryState {}
+
+/// State ketika data riwayat absensi berhasil di-load
 class AttendanceHistoryLoaded extends AttendanceHistoryState {
   final List<Map<String, dynamic>> attendanceList;
   final int absent;
@@ -48,6 +51,8 @@ class AttendanceHistoryLoaded extends AttendanceHistoryState {
   @override
   List<Object?> get props => [attendanceList, absent, lateClockIn, earlyClockOut, noClockIn, noClockOut, selectedMonth];
 }
+
+/// State ketika terjadi error
 class AttendanceHistoryError extends AttendanceHistoryState {
   final String error;
   const AttendanceHistoryError(this.error);
@@ -55,14 +60,17 @@ class AttendanceHistoryError extends AttendanceHistoryState {
   List<Object?> get props => [error];
 }
 
-// Bloc
+/// Bloc untuk mengelola state riwayat absensi
 class AttendanceHistoryBloc extends Bloc<AttendanceHistoryEvent, AttendanceHistoryState> {
   final AttendanceRepository repository;
   AttendanceHistoryBloc({required this.repository}) : super(AttendanceHistoryInitial()) {
     on<AttendanceHistoryFetch>(_onFetch);
   }
 
-  Future<void> _onFetch(AttendanceHistoryFetch event, Emitter<AttendanceHistoryState> emit) async {
+  Future<void> _onFetch(
+    AttendanceHistoryFetch event,
+    Emitter<AttendanceHistoryState> emit,
+  ) async {
     emit(AttendanceHistoryLoading());
     try {
       final now = event.month;

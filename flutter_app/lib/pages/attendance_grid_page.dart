@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import '../widgets/custom_button.dart';
+import '../utils/date_formatter.dart';
+import '../themes/theme.dart';
 import 'attendance_history_page.dart';
 import '../bloc/attendance_grid/attendance_grid_bloc.dart';
 import '../repositories/attendance_repository.dart';
@@ -30,10 +32,10 @@ class _AttendanceGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final dateStr = DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(now);
+    final dateStr = formatDate(now);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A237E),
+      backgroundColor: primaryBlue,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -66,7 +68,7 @@ class _AttendanceGridView extends StatelessWidget {
                     builder: (context, snapshot) {
                       final now = snapshot.data ?? DateTime.now();
                       return Text(
-                        DateFormat('HH:mm').format(now),
+                        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
                         style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white),
                       );
                     },
@@ -95,32 +97,24 @@ class _AttendanceGridView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF1A237E),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                      CustomButton(
+                        label: 'Clock In',
+                        color: Colors.white,
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => AttendanceClockInPage(userData: userData, token: token),
                           ));
                         },
-                        child: const Text('Clock In'),
                       ),
                       const SizedBox(width: 16),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF1A237E),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                      CustomButton(
+                        label: 'Clock Out',
+                        color: Colors.white,
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => AttendanceClockOutPage(userData: userData, token: token),
                           ));
                         },
-                        child: const Text('Clock Out'),
                       ),
                     ],
                   ),

@@ -7,6 +7,8 @@ import 'location_map_page.dart';
 import 'success_attendance_page.dart';
 import '../bloc/clock_in/clock_in_bloc.dart';
 import '../repositories/attendance_repository.dart';
+import '../widgets/custom_button.dart';
+import '../themes/theme.dart';
 
 class AttendanceClockInPage extends StatelessWidget {
   final Map<String, dynamic> userData;
@@ -88,7 +90,7 @@ class _ClockInFormState extends State<_ClockInForm> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Clock In')),
+        appBar: AppBar(title: const Text('Clock In'), backgroundColor: primaryBlue),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -124,10 +126,10 @@ class _ClockInFormState extends State<_ClockInForm> {
                           const SizedBox(height: 16),
                           Row(
                             children: [
-                              ElevatedButton.icon(
+                              CustomButton(
+                                label: 'Ambil Foto (opsional)',
+                                color: primaryBlue,
                                 onPressed: state.isLoading ? null : _onPickImage,
-                                icon: const Icon(Icons.camera_alt),
-                                label: const Text('Ambil Foto (opsional)'),
                               ),
                               const SizedBox(width: 12),
                               if (state.imageFile != null)
@@ -180,21 +182,13 @@ class _ClockInFormState extends State<_ClockInForm> {
                           const SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton.icon(
+                            child: CustomButton(
+                              label: state.isLoading ? '' : 'Kirim Clock In',
+                              color: primaryBlue,
                               onPressed: state.isLoading ? null : _onSubmit,
-                              icon: const Icon(Icons.login),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1A237E),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              label: state.isLoading
+                              child: state.isLoading
                                   ? const CircularProgressIndicator(color: Colors.white)
-                                  : const Text('Kirim Clock In'),
+                                  : null,
                             ),
                           ),
                         ],

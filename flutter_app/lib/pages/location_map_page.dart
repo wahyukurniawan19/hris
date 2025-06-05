@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../themes/theme.dart';
 
 class LocationMapPage extends StatelessWidget {
   final double latitude;
@@ -14,40 +15,41 @@ class LocationMapPage extends StatelessWidget {
         child: Column(
           children: [
             Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFF1A237E),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(32),
-              bottomRight: Radius.circular(32),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 18),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Center(
-                child: Column(
-                  children: const [
-                    Text(
-                      'Lokasi Anda',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: primaryBlue,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 18),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Center(
+                    child: Column(
+                      children: const [
+                        Text(
+                          'Lokasi Anda',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                      ],
                     ),
-                    SizedBox(height: 8),
-                  ],
-                ),
-              ),
-              Positioned(
-                right: 0,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: const Icon(Icons.close, color: Colors.white, size: 28),
-                ),
-              ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: const Icon(Icons.close, color: Colors.white, size: 28),
+                    ),
+                  ),
                 ],
               ),
             ),

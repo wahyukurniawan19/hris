@@ -5,6 +5,8 @@ import '../config.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../bloc/login/login_bloc.dart';
 import '../repositories/auth_repository.dart';
+import '../themes/theme.dart';
+import '../widgets/custom_button.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -58,7 +60,6 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = const Color(0xFF1A237E);
     final theme = Theme.of(context);
 
     return BlocListener<LoginBloc, LoginState>(
@@ -75,7 +76,7 @@ class _LoginFormState extends State<LoginForm> {
         }
       },
       child: Scaffold(
-        backgroundColor: theme.colorScheme.background,
+        backgroundColor: backgroundGray,
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _handleRefresh,
@@ -90,7 +91,7 @@ class _LoginFormState extends State<LoginForm> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 48),
                     decoration: BoxDecoration(
-                      color: primaryColor,
+                      color: primaryBlue,
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(32),
                         bottomRight: Radius.circular(32),
@@ -216,21 +217,11 @@ class _LoginFormState extends State<LoginForm> {
                                 SizedBox(
                                   height: 54,
                                   width: double.infinity,
-                                  child: ElevatedButton.icon(
-                                    icon: const Icon(Icons.login, size: 22),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      textStyle: GoogleFonts.poppins(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                  child: CustomButton(
+                                    label: isLoading ? '' : 'Login',
+                                    color: primaryBlue,
                                     onPressed: isLoading ? null : () => _onLoginPressed(context),
-                                    label: isLoading
+                                    child: isLoading
                                         ? const SizedBox(
                                             width: 24,
                                             height: 24,
@@ -239,7 +230,7 @@ class _LoginFormState extends State<LoginForm> {
                                               color: Colors.white,
                                             ),
                                           )
-                                        : const Text('Login'),
+                                        : null,
                                   ),
                                 ),
                               ],
