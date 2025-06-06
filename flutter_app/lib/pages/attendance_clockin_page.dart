@@ -186,9 +186,6 @@ class _ClockInFormState extends State<_ClockInForm> {
                               label: state.isLoading ? '' : 'Kirim Clock In',
                               color: primaryBlue,
                               onPressed: state.isLoading ? null : _onSubmit,
-                              child: state.isLoading
-                                  ? const CircularProgressIndicator(color: Colors.white)
-                                  : null,
                             ),
                           ),
                         ],

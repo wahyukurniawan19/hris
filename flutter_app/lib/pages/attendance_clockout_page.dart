@@ -186,9 +186,6 @@ class _ClockOutFormState extends State<_ClockOutForm> {
                               label: state.isLoading ? '' : 'Kirim Clock Out',
                               color: primaryBlue,
                               onPressed: state.isLoading ? null : _onSubmit,
-                              child: state.isLoading
-                                  ? const CircularProgressIndicator(color: Colors.white)
-                                  : null,
                             ),
                           ),
                         ],

@@ -221,16 +221,6 @@ class _LoginFormState extends State<LoginForm> {
                                     label: isLoading ? '' : 'Login',
                                     color: primaryBlue,
                                     onPressed: isLoading ? null : () => _onLoginPressed(context),
-                                    child: isLoading
-                                        ? const SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : null,
                                   ),
                                 ),
                               ],

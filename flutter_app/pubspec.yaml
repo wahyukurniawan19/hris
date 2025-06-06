@@ -33,7 +33,7 @@ dependencies:
   http: ^1.4.0
   image_picker: ^1.0.7
   geolocator: ^10.1.0
-  intl: ^0.18.1
+  intl: ^0.19.0
   flutter_map: ^6.1.0
   latlong2: ^0.9.0
   another_flushbar: ^1.12.30
@@ -41,6 +41,7 @@ dependencies:
   url_launcher: ^6.2.5
   google_fonts: ^6.1.0
   animated_bottom_navigation_bar: ^1.2.0
+  barcode_widget: ^2.0.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -48,6 +49,22 @@ dependencies:
   flutter_bloc: ^9.1.1
   bloc: ^9.0.0
   equatable: ^2.0.7
+
+  cloud_firestore: ^4.8.0
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  get: ^4.6.5
+  get_storage: ^2.1.1
+  flutter_easyloading: ^3.0.5
+  flutter_localizations:
+    sdk: flutter
+  flutter_mentions: ^2.0.1
+  hexcolor: ^3.0.1
+  overlay_support: ^2.0.1
+  in_app_notification: ^1.1.2
+  flutter_translate: ^4.0.4
+  flutter_displaymode: ^0.6.0
+  persistent_bottom_nav_bar_v2: ^4.2.4
 
 dev_dependencies:
   flutter_test:
@@ -104,6 +121,7 @@ flutter:
 
   assets:
     # tambahkan asset font jika perlu
+  # Jika menggunakan Firebase, jalankan 'flutterfire configure' untuk generate file firebase_options.dart
   fonts:
     - family: Poppins
       fonts:
